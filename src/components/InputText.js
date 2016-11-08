@@ -5,7 +5,11 @@ import React, {Component} from 'react';
  * only when Enter is pressed or focus is lost.
  */
 class InputText extends Component {
-  state = {}
+
+  constructor(props) {
+    super(props)
+    this.state = {value: props.value}
+  }
 
   componentWillReceiveProps(nextProps) {
     this.setState({value: nextProps.value})

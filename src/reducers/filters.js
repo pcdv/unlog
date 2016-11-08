@@ -15,6 +15,9 @@ export default function filters(state = INITIAL_STATE, action) {
     case ACTION.SET_EXCLUDES:
       return Object.assign({}, state, { exclude: action.exclude })
 
+    case ACTION.SET_REPLACE_RULES:
+      return Object.assign({}, state, { replaceRules: action.rules})
+
     case ACTION.ADD_REPLACE_RULE:
       return Object.assign({}, state, { replaceRules: [...state.replaceRules, { pattern: '', replace: '' }] })
 
