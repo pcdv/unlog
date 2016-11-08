@@ -42,8 +42,10 @@ class LoadedFile {
       lines = lines || text.split(/[\n\r]+/g)
 
       options.replaceRules.forEach(r => {
-        const re = new RegExp(r.pattern)
-        lines = lines.map(line => line.replace(re, r.replace))
+        if (r.pattern) {
+          const re = new RegExp(r.pattern)
+          lines = lines.map(line => line.replace(re, r.replace))
+        }
       })
     }
 
