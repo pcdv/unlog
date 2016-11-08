@@ -44,6 +44,12 @@ export function updateReplaceRule(index, data) {
   }
 }
 
+export function deleteReplaceRule(index, data) {
+  return {
+    type: ACTION.DELETE_REPLACE_RULE, index, data
+  }
+}
+
 function escapeArray(arr) {
   if (!arr || !arr.length)
     return undefined

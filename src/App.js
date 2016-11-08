@@ -4,25 +4,33 @@ import FileSelection from './containers/FileSelection'
 import LogView from './containers/LogView'
 import Filters from './containers/Filters'
 import ReplaceRules from './containers/ReplaceRules'
-import {initFilters} from './actions/filterActions'
-import {connect} from 'react-redux'
+import { initFilters } from './actions/filterActions'
+import { connect } from 'react-redux'
+import Title from 'react-document-title'
 
 class App extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch(initFilters())
+    this.props.dispatch(initFilters())
   }
 
   render() {
+    const {fileName} = this.props
+    let title = "UnLog"
+    if (fileName)
+      title += ` :: ${fileName}`
     return (
-      <div>
-        <FileSelection />
-        <Filters />
-        <ReplaceRules />
-        <LogView />
-      </div>
+      <Title title={title}>
+        <div>
+          <FileSelection />
+          <Filters />
+          <ReplaceRules />
+          <LogView />
+        </div>
+      </Title>
     );
   }
 }
 
-export default connect()(App)
+const mapStateToProps = state => ({ fileName: state.fileSelection.name })
+
+export default connect(mapStateToProps)(App)

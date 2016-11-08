@@ -16,12 +16,19 @@ export default function filters(state = INITIAL_STATE, action) {
       return Object.assign({}, state, { exclude: action.exclude })
 
     case ACTION.ADD_REPLACE_RULE:
-      return Object.assign({}, state, { replaceRules: [...state.replaceRules, { pattern: '', replace: '', index: state.replaceRules.length }] })
+      return Object.assign({}, state, { replaceRules: [...state.replaceRules, { pattern: '', replace: '' }] })
 
-    case ACTION.UPDATE_REPLACE_RULE:
+    case ACTION.UPDATE_REPLACE_RULE: {
       const rules = state.replaceRules
-      const newRules = [ ...rules.slice(0, action.index), Object.assign({}, rules[action.index], action.data), ...rules.slice(action.index + 1) ]
+      const newRules = [...rules.slice(0, action.index), Object.assign({}, rules[action.index], action.data), ...rules.slice(action.index + 1)]
       return Object.assign({}, state, { replaceRules: newRules })
+    }
+
+    case ACTION.DELETE_REPLACE_RULE: {
+      const rules = state.replaceRules
+      const newRules = [...rules.slice(0, action.index), ...rules.slice(action.index + 1)]
+      return Object.assign({}, state, { replaceRules: newRules })
+    }
 
     default:
       return state

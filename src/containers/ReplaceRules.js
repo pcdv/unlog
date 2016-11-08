@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { addReplaceRule, updateReplaceRule } from '../actions/filterActions'
+import { addReplaceRule, updateReplaceRule, deleteReplaceRule } from '../actions/filterActions'
 import InputText from '../components/InputText'
 
 class ReplaceRules extends Component {
@@ -18,7 +18,8 @@ class ReplaceRules extends Component {
 
 function mapStateToProps(state) {
   const {replaceRules} = state.filters
-  return { replaceRules }
+  let index = 0
+  return { replaceRules: replaceRules.map(r => Object.assign(r, {index: index++})) }
 }
 
 export default connect(mapStateToProps)(ReplaceRules)
@@ -30,6 +31,7 @@ class ReplaceRule extends Component {
       <div>
         <InputText placeholder="Pattern" value={rule.pattern} onChange={s => dispatch(updateReplaceRule(rule.index, { pattern: s }))} />
         <InputText placeholder="Replace" value={rule.replace} onChange={s => dispatch(updateReplaceRule(rule.index, { replace: s }))} />
+        <button onClick={s => dispatch(deleteReplaceRule(rule.index))}>Delete</button>
       </div>
     )
   }
