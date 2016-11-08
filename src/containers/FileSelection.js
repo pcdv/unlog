@@ -8,15 +8,13 @@ class FileSelection extends Component {
     const {name, onFileChange, onCloseFile} = this.props
 
     return (
-      <div>
+      <span>
         {name
-          ? <div>Selected file: {name}
-          <button onClick={onCloseFile}>Close</button>
-          </div>
+          ? <button onClick={onCloseFile}>Close</button>
           : <FileInput onChange={onFileChange}>
             <button>Select file...</button>
           </FileInput>}
-      </div>
+      </span>
     );
   }
 }
@@ -26,11 +24,9 @@ function mapStateToProps(state) {
   return { name }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    onFileChange: file => dispatch(loadFile(file)),
-    onCloseFile: () => dispatch(closeFile())
-  }
+const mapDispatchToProps = {
+  onFileChange: loadFile,
+  onCloseFile: closeFile
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(FileSelection)
