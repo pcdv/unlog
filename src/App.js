@@ -3,7 +3,6 @@ import './App.css';
 import FileSelection from './containers/FileSelection'
 import LogView from './containers/LogView'
 import Filters from './containers/Filters'
-import ReplaceRules from './containers/ReplaceRules'
 import { initFilters } from './actions/filterActions'
 import { connect } from 'react-redux'
 import Title from 'react-document-title'
@@ -23,7 +22,6 @@ class App extends Component {
         <div>
           <FileSelection />
           <Filters />
-          <ReplaceRules />
           <LogView />
         </div>
       </Title>

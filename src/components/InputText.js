@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 /**
  * Like <input type="text"/> but allows to dispatch onChange(value) 
@@ -8,20 +8,25 @@ class InputText extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {value: props.value}
+    this.state = { value: props.value }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({value: nextProps.value})
+    this.setState({ value: nextProps.value })
   }
-  
+
   render() {
-    const {orig, placeholder, title} = this.props
+    const {orig, placeholder, title, style, size} = this.props
     const {value} = this.state
 
     return (
-      <input type="text" value={(value != null ? value : orig) || ""} placeholder={placeholder} title={title}
-        onChange={e => this.setState({ value: e.target.value }) }
+      <input type="text"
+        value={(value != null ? value : orig) || ""}
+        placeholder={placeholder} 
+        title={title}
+        style={style}
+        size={size}
+        onChange={e => this.setState({ value: e.target.value })}
         onKeyUp={e => {
           if (e.keyCode === 27)
             this.setState({ value: null })

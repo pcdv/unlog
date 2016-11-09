@@ -1,28 +1,6 @@
 import * as ACTION from '../constants/actions'
 import { replace } from 'react-router-redux'
 
-export function setIncludes(include, qs = true) {
-  return (dispatch, getState) => {
-    dispatch({ type: ACTION.SET_INCLUDES, include })
-    qs && dispatch(updateQuery())
-  }
-}
-
-export function setExcludes(exclude, qs = true) {
-  return (dispatch, getState) => {
-    dispatch({ type: ACTION.SET_EXCLUDES, exclude })
-    qs && dispatch(updateQuery())
-  }
-}
-
-export function setReplaceRules(rules, qs = true) {
-  return (dispatch, getState) => {
-    dispatch({ type: ACTION.SET_REPLACE_RULES, rules })
-    qs && dispatch(updateQuery())
-  }
-}
-
-
 /**
  * Copies current filter state into query.
  */
@@ -30,9 +8,7 @@ export function updateQuery() {
   return (dispatch, getState) => {
     const {filters} = getState()
     const query = {
-      include: escapeArray(filters.include),
-      exclude: escapeArray(filters.exclude),
-      replace: escapeJsonArray(filters.replaceRules)
+      filters: escapeJsonArray(filters)
     }
     dispatch(replace({ query }))
   }
@@ -41,55 +17,61 @@ export function updateQuery() {
 export function initFilters() {
   return (dispatch, getState) => {
     const query = getState().routing.locationBeforeTransitions.query
-    if (query.include)
-      dispatch(setIncludes(toArray(query.include), false))
-    if (query.exclude)
-      dispatch(setExcludes(toArray(query.exclude), false))
-    if (query.replace)
-      dispatch(setReplaceRules(toJsonArray(query.replace), false))  
+    if (query.filters)
+      dispatch(setFilters(toJsonArray(query.filters), false))
   }
 }
 
-export function addReplaceRule() {
+export function setFilters(filters, qs) {
   return (dispatch, getState) => {
-    dispatch({ type: ACTION.ADD_REPLACE_RULE })
+    dispatch({ type: ACTION.SET_FILTERS, filters})
+    qs && dispatch(updateQuery())
+  }
+}
+
+export function addFilter(data) {
+  return (dispatch, getState) => {
+    dispatch({ type: ACTION.ADD_FILTER, filter: Object.assign({}, data) })
     dispatch(updateQuery())
   }
 }
 
-export function updateReplaceRule(index, data) {
+export function updateFilter(index, data) {
   return (dispatch, getState) => {
-    dispatch({ type: ACTION.UPDATE_REPLACE_RULE, index, data })
+    dispatch({ type: ACTION.UPDATE_FILTER, index, data })
     dispatch(updateQuery())
   }
 }
 
-export function deleteReplaceRule(index) {
+export function deleteFilter(index) {
   return (dispatch, getState) => {
-    dispatch({ type: ACTION.DELETE_REPLACE_RULE, index })
+    dispatch({ type: ACTION.DELETE_FILTER, index })
     dispatch(updateQuery())
   }
 }
 
-function escapeArray(arr) {
+export function escapeArray(arr) {
   if (!arr || !arr.length)
     return undefined
 
   return arr.map(i => escape(i)).join("+")
 }
 
-
-function escapeJsonArray(arr) {
-  if (!arr || !arr.length)
-    return undefined
-
-  return arr.map(i => escape(JSON.stringify(i))).join("+")
-}
-
-function toArray(obj) {
+export function toArray(obj) {
   return obj.split("+").map(s => unescape(s))
 }
 
-function toJsonArray(obj) {
+export function escapeJsonArray(arr) {
+  if (!arr || !arr.length)
+    return undefined
+
+  return arr.map(i => escplus(JSON.stringify(i))).join("+")
+}
+
+export function toJsonArray(obj) {
   return obj.split("+").map(s => JSON.parse(unescape(s)))
+}
+
+function escplus(s) {
+  return escape(s).replace(/\+/g, '%2B')
 }

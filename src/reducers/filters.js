@@ -1,37 +1,24 @@
 import * as ACTION from '../constants/actions'
 
-const INITIAL_STATE = {
-  include: [],
-  exclude: [],
-  replaceRules: [],
-}
-
-export default function filters(state = INITIAL_STATE, action) {
+export default function filters(state = [], action) {
   switch (action.type) {
 
-    case ACTION.SET_INCLUDES:
-      return Object.assign({}, state, { include: action.include })
+    case ACTION.SET_FILTERS:
+      return action.filters
 
-    case ACTION.SET_EXCLUDES:
-      return Object.assign({}, state, { exclude: action.exclude })
+    case ACTION.ADD_FILTER:
+      return [...state, action.filter]
 
-    case ACTION.SET_REPLACE_RULES:
-      return Object.assign({}, state, { replaceRules: action.rules})
+    case ACTION.UPDATE_FILTER:
+      return [
+        ...state.slice(0, action.index),
+        Object.assign({}, state[action.index], action.data),
+        ...state.slice(action.index + 1)]
 
-    case ACTION.ADD_REPLACE_RULE:
-      return Object.assign({}, state, { replaceRules: [...state.replaceRules, { pattern: '', replace: '' }] })
-
-    case ACTION.UPDATE_REPLACE_RULE: {
-      const rules = state.replaceRules
-      const newRules = [...rules.slice(0, action.index), Object.assign({}, rules[action.index], action.data), ...rules.slice(action.index + 1)]
-      return Object.assign({}, state, { replaceRules: newRules })
-    }
-
-    case ACTION.DELETE_REPLACE_RULE: {
-      const rules = state.replaceRules
-      const newRules = [...rules.slice(0, action.index), ...rules.slice(action.index + 1)]
-      return Object.assign({}, state, { replaceRules: newRules })
-    }
+    case ACTION.DELETE_FILTER:
+      if (action.index >= 0 && action.index < state.length)
+        return [...state.slice(0, action.index), ...state.slice(action.index + 1)]
+      break
 
     default:
       return state

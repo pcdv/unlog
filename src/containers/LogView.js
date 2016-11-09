@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import './LogView.css'
+import download from '../util/download'
 
 class LogView extends Component {
   render() {
     const {file, filters} = this.props
 
     if (!file)
-      return <span/>
+      return <span />
 
+    const text = file.getExcerpt(filters)
+    
     return (
       <pre>
-      {file.getExcerpt(filters)}
+        <button onClick={() => download("out.csv", text)}>Download as CSV</button>
+        {text}
       </pre>
     );
   }
