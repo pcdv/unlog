@@ -15,6 +15,20 @@ export default function filters(state = [], action) {
         Object.assign({}, state[action.index], action.data),
         ...state.slice(action.index + 1)]
 
+    case ACTION.UP_FILTER:
+      return [
+        ...state.slice(0, action.index - 1),
+        state[action.index],
+        state[action.index - 1],
+        ...state.slice(action.index + 1)]
+
+    case ACTION.DOWN_FILTER:
+      return [
+        ...state.slice(0, action.index),
+        state[action.index + 1],
+        state[action.index],
+        ...state.slice(action.index + 2)]
+
     case ACTION.DELETE_FILTER:
       if (action.index >= 0 && action.index < state.length)
         return [...state.slice(0, action.index), ...state.slice(action.index + 1)]

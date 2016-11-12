@@ -10,7 +10,7 @@ class FileSelection extends Component {
     return (
       <span>
         {name
-          ? <button onClick={onCloseFile}>Close</button>
+          ? <button onClick={onCloseFile}>Close file</button>
           : <FileInput onChange={onFileChange}>
             <button>Select file...</button>
           </FileInput>}

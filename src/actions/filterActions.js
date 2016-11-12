@@ -31,7 +31,7 @@ export function setFilters(filters, qs) {
 
 export function addFilter(data) {
   return (dispatch, getState) => {
-    dispatch({ type: ACTION.ADD_FILTER, filter: Object.assign({}, data) })
+    dispatch({ type: ACTION.ADD_FILTER, filter: Object.assign({type: "invalid", enabled: true}, data) })
     dispatch(updateQuery())
   }
 }
@@ -39,6 +39,20 @@ export function addFilter(data) {
 export function updateFilter(index, data) {
   return (dispatch, getState) => {
     dispatch({ type: ACTION.UPDATE_FILTER, index, data })
+    dispatch(updateQuery())
+  }
+}
+
+export function upFilter(index) {
+  return (dispatch, getState) => {
+    dispatch({ type: ACTION.UP_FILTER, index})
+    dispatch(updateQuery())
+  }
+}
+
+export function downFilter(index) {
+  return (dispatch, getState) => {
+    dispatch({ type: ACTION.DOWN_FILTER, index})
     dispatch(updateQuery())
   }
 }

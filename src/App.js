@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import FileSelection from './containers/FileSelection'
-import LogView from './containers/LogView'
+import Result from './containers/Result'
 import Filters from './containers/Filters'
 import { initFilters } from './actions/filterActions'
 import { connect } from 'react-redux'
@@ -22,7 +22,7 @@ class App extends Component {
         <div>
           <FileSelection />
           <Filters />
-          <LogView />
+          <Result />
         </div>
       </Title>
     );

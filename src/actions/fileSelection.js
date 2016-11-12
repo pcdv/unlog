@@ -1,5 +1,4 @@
 import * as ACTION from '../constants/actions'
-import {LoadedFile} from '../api/processors'
 
 export function loadFile(file) {
   return (dispatch, getState) => {
@@ -13,7 +12,7 @@ export function replaceLogFile(file, text) {
   return {
     type: ACTION.REPLACE_LOG_FILE,
     name: file.name,
-    file: new LoadedFile(text)
+    text
   }
 }
 

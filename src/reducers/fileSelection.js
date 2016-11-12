@@ -5,7 +5,7 @@ export default function fileSelection(state = {}, action) {
     case ACTION.REPLACE_LOG_FILE:
       return Object.assign({}, state, {
         name: action.name,
-        file: action.file
+        text: action.text
       })
 
     case ACTION.CLOSE_LOG_FILE:

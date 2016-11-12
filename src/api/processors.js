@@ -1,5 +1,3 @@
-const MAX_LENGTH = 10 * 1024 * 1024
-const MAX_LINES = 1000
 
 const DUMMY = {
   compute: function (filter, lines) {
@@ -54,7 +52,7 @@ import moment from 'moment'
 
 function append(res, from, to, val, step, fillZeros) {
   while (from < to) {
-    const ts = moment(from * step).format('hh:mm:ss')
+    const ts = moment(from * step).format('hh:mm:ss')+","+((from*step) % 1000)
     res.push(`${ts};${val}`)
     from += 1
     if (fillZeros)
@@ -90,7 +88,7 @@ class Throughput {
 
           if (weight) {
             const repl = line.replace(weight, '$1')
-            value += Number.parseInt(repl)
+            value += Number.parseInt(repl, 10)
           }
           else
             value++
@@ -121,20 +119,3 @@ export function getProcessor(filter) {
   }
 }
 
-
-export class LoadedFile {
-  constructor(data) {
-    this.data = data.split(/[\n\r]+/g)
-  }
-
-  getExcerpt(filters) {
-    let lines = this.data
-
-    filters.forEach(filter => {
-      lines = getProcessor(filter).compute(filter, lines)
-    })
-
-    const res = lines.slice(0, MAX_LINES).join('\n')
-    return res.length < MAX_LENGTH ? res : res.substring(0, MAX_LENGTH)
-  }
-}

@@ -1,4 +1,7 @@
 export default function enumerate(array) {
   let index = 0
-  return array.map(i => Object.assign({}, i, { index: index++ }))
+  const res = array.map(i => Object.assign({}, i, { index: index++ }))
+  if (res.length)
+    res[res.length - 1].isLast = true
+  return res
 }

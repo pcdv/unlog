@@ -6,5 +6,5 @@ it("should override index", () => {
   arr.push({ foo: 'bar2', index: 43 })
   const enu = enumerate(arr)
   expect(enu[0]).toEqual({index: 0, foo: 'bar'})
-  expect(enu[1]).toEqual({index: 1, foo: 'bar2'})
+  expect(enu[1]).toEqual({index: 1, foo: 'bar2', isLast: true})
 })
