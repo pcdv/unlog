@@ -68,8 +68,8 @@ const Text = connect(null, { updateFilter })(_Text)
 
 const _Cat = ({filter, updateFilter, loadFile }) => (
   <span>
-    {name
-      ? <button onClick={updateFilter(filter.index, {text: '', name: undefined})}>Close file</button>
+    {filter.file
+      ? <button onClick={() => updateFilter(filter.index, {text: '', file: undefined})}>Close file</button>
       : <FileInput onChange={file => loadFile(filter.index, file)}>
         <button>Select file2...</button>
       </FileInput>}
