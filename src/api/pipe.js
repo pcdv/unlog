@@ -4,6 +4,10 @@ export default class Pipe {
     this.previous = previous
   }
 
+  static isValid(filter) {
+    return filter.enabled
+  }
+
   getOutput(type) {
     if (!this.previous)
       throw new Error('No previous pipe given to '+this.constructor.name)

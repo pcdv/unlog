@@ -2,6 +2,10 @@ import Pipe from './pipe'
 
 export default class Include extends Pipe {
 
+  static isValid(filter) {
+    return !!filter.pattern
+  }
+
   getOutput(type) {
     return this.compute(this.previous.getOutput(type))
   }

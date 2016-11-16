@@ -8,33 +8,12 @@ const createDeepEqualSelector = createSelectorCreator(
   isEqual
 )
 
-function isFilterValid(filter) {
-  if (!filter.enabled)
-    return false
-
-  switch (filter.type) {
-    case "include":
-    case "exclude":
-    case "replace":
-      return !!filter.pattern
-
-    case "throughput":
-      return !!filter.period
-
-    case "sort":
-      return true
-
-    default:
-      return true
-  }
-}
-
 /**
  * Returns only filters that have an effect on data (invalid and incomplete 
  * filters are ignored.)
  */
 const getValidFilters = state => {
-  return state.filters.filter(isFilterValid)
+  return state.filters.filter(filter => filter.enabled && getProcessor(filter).isValid(filter))
 }
 
 const getSettings = state => {
