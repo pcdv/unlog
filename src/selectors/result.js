@@ -1,6 +1,6 @@
 import { createSelectorCreator, defaultMemoize } from 'reselect'
 import isEqual from 'lodash/isEqual'
-import { getProcessor } from '../api/processors'
+import { getProcessor } from '../api'
 
 // create a "selector creator" that uses lodash.isEqual instead of ===
 const createDeepEqualSelector = createSelectorCreator(
@@ -11,7 +11,7 @@ const createDeepEqualSelector = createSelectorCreator(
 function isFilterValid(filter) {
   if (!filter.enabled)
     return false
-    
+
   switch (filter.type) {
     case "include":
     case "exclude":
@@ -21,8 +21,11 @@ function isFilterValid(filter) {
     case "throughput":
       return !!filter.period
 
+    case "sort":
+      return true
+
     default:
-      return false
+      return true
   }
 }
 
@@ -34,29 +37,36 @@ const getValidFilters = state => {
   return state.filters.filter(isFilterValid)
 }
 
-const getText = state => {
-  return state.fileSelection.text
+const getSettings = state => {
+  return state.settings
 }
 
-const MAX_LENGTH = 10 * 1024 * 1024
-const MAX_LINES = 1000
-
 export const getResult = createDeepEqualSelector(
-  getValidFilters, getText,
-  (filters, text) => {
+  getValidFilters, getSettings,
+  (filters, settings) => {
 
-    console.log("getResult() called")
+    if (!filters.length)
+      return { text: 'No pipes' }
 
-    if (!filters.length || !text)
-      return {text}
+    let previousPipe
 
-    let lines = text.split(/[\n\r]+/g)
-
-    filters.forEach(filter => {
-      lines = getProcessor(filter).compute(filter, lines)
+    const pipes = filters.map(filter => {
+      const pipeClass = getProcessor(filter)
+      const pipe = new pipeClass(filter, previousPipe) 
+      previousPipe = pipe
+      return pipe
     })
 
-    const res = lines.slice(0, MAX_LINES).join('\n')
-    return { text: res.length < MAX_LENGTH ? res : res.substring(0, MAX_LENGTH)}
+    const last = pipes[pipes.length - 1]
+    
+    if (!last.getOutput)
+      throw new Error('Invalid pipe implementation: '+last.constructor.name)
+    const lines = last.getOutput('lines')
+
+    const linesDropped = lines.length <= settings.maxLines ? 0 : lines.length - settings.maxLines
+    const res = lines.slice(0, settings.maxLines).join('\n')
+    const txt = res.length < settings.maxChars ? res : res.substring(0, settings.maxChars)
+    const charsDropped = res.length <= settings.maxChars ? 0 : res.length - txt.length
+    return { text: txt, charsDropped, linesDropped }
   }
 )

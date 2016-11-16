@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import download from '../util/download'
-import {getResult} from '../selectors/result'
+import { getResult } from '../selectors/result'
 
 // TODO: compute derived data in state + show it here
 class Result extends Component {
@@ -14,6 +14,9 @@ class Result extends Component {
     return (
       <pre>
         <button onClick={() => download("out.csv", result.text)}>Download as CSV</button>
+        <br />
+        {result.charsDropped ? <h2>{result.charsDropped} characters were truncated.</h2> : null}
+        {result.linesDropped ? <h2>{result.linesDropped} lines were truncated.</h2> : null}
         {result.text}
       </pre>
     );

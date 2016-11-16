@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import FileSelection from './containers/FileSelection'
 import Result from './containers/Result'
 import Filters from './containers/Filters'
 import { initFilters } from './actions/filterActions'
@@ -20,7 +19,6 @@ class App extends Component {
     return (
       <Title title={title}>
         <div>
-          <FileSelection />
           <Filters />
           <Result />
         </div>

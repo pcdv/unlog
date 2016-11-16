@@ -1,30 +1,40 @@
-import { LoadedFile } from './processors'
+import { getResult } from '../selectors/result'
+import { replaceLogFile } from '../actions/fileSelection'
+import { setFilters } from '../actions/filterActions'
+import configureStore from '../store/configureStore'
+
+function apply(filters, text) {
+    const store = configureStore()
+    const file = {type: 'text', text, enabled: true}
+    store.dispatch(replaceLogFile({ name: 'foo' }, text))
+    store.dispatch(setFilters([file].concat(filters)))
+    return getResult(store.getState()).text
+}
 
 it("should tolerate invalid filters", () => {
     const filters = [{}]
-    const file = new LoadedFile("foo")
-    const res = file.getExcerpt(filters)
+    const res = apply(filters, "foo")
     expect(res).toEqual("foo")
 })
 
 it("applies include rule", () => {
-    const filters = [{ type: 'include', pattern: 'bar' }]
-    const file = new LoadedFile("foo\nbar\nbaz")
-    const res = file.getExcerpt(filters)
+    const filters = [{ type: 'include', pattern: 'bar', enabled: true }]
+    const file = "foo\nbar\nbaz"
+    const res = apply(filters, file)
     expect(res).toEqual("bar")
 })
 
 it("applies exclude rule", () => {
-    const filters = [{ type: 'exclude', pattern: 'bar' }]
-    const file = new LoadedFile("foo\nbar\nbaz")
-    const res = file.getExcerpt(filters)
+    const filters = [{ type: 'exclude', pattern: 'bar', enabled: true }]
+    const file = "foo\nbar\nbaz"
+    const res = apply(filters, file)
     expect(res).toEqual("foo\nbaz")
 })
 
 it("applies replace rule", () => {
-    const filters = [{ type: 'replace', pattern: 'b(.)r', replace: '$1' }]
-    const file = new LoadedFile("foo\nbar\nbaz")
-    const res = file.getExcerpt(filters)
+    const filters = [{ type: 'replace', pattern: 'b(.)r', replace: '$1', enabled: true }]
+    const file = "foo\nbar\nbaz"
+    const res = apply(filters, file)
     expect(res).toEqual("foo\na\nbaz")
 })
 
@@ -38,11 +48,10 @@ const log = `
 2016-11-01 10:13:23,699 MM1 3 0    13 13 13
 2016-11-01 10:13:25,416 MM1 3 0    13 13 12
 `
-const file = new LoadedFile(log)
+
 it('fills zeros', () => {
-    const filters = [{ type: 'throughput', period: 1000, fillZeros: 'y' }]
-    const res = file.getExcerpt(filters)
-    expect(res).toEqual(`Time;Throughput
+    const filters = [{ type: 'throughput', period: 1000, fillZeros: 'y', enabled: true }]
+    expect(apply(filters, log)).toEqual(`Time;Throughput
 10:13:21;2
 10:13:22;0
 10:13:23;5
@@ -51,11 +60,43 @@ it('fills zeros', () => {
 })
 
 it('calculates weight', () => {
-    const filters = [{ type: 'throughput', period: 1000, weight: '.*MM1 (\\d+) .*' }]
-    const res = file.getExcerpt(filters)
-    expect(res).toEqual(`Time;Throughput
+    const filters = [{ type: 'throughput', period: 1000, weight: '.*MM1 (\\d+) .*', enabled: true }]
+    expect(apply(filters, log)).toEqual(`Time;Throughput
 10:13:21;8
 10:13:23;24
 10:13:25;3`)
+})
 
+it('supports weird periods', () => {
+    const filters = [{ type: 'throughput', period: 5000, enabled: true }]
+    expect(apply(filters, log)).toEqual(`Time;Throughput
+10:13:20;1.4
+10:13:25;0.2`)
+})
+
+
+it('supports HH:mm:ss,SSS', () => {
+    const filters = [{ type: 'throughput', period: 5000, enabled: true }]
+    expect(apply(filters, log.replace(/2016-11-01 /g, ''))).toEqual(`Time;Throughput
+10:13:20;1.4
+10:13:25;0.2`)
+})
+
+it('gives useful feedback when time cannot be parsed', () => {
+    const filters = [{ type: 'throughput', period: 5000, enabled: true }]
+    expect(apply(filters, 'foo\nbar')).toEqual('Could not guess time format')
+})
+
+it('WTF', () => {
+    const filters = [{ type: 'throughput', period: 1000, enabled: true }]
+    expect(apply(filters, `
+eeeeeeeeee 2016-11-01 10:13:21,687 MM3     13 12 12 11 10 9 9
+eeeeeeeeee 2016-11-01 10:13:21,687 MM2     13 11 10 10 9 8`)).toEqual('Could not guess time format')
+})
+
+it('sorts numeric values', () => {
+    const log = [1, 3, 10, 15, 20, 10, 2].join('\n')
+    const filters = [{ type: 'sort', numeric: true, unique: true, reverse: true, enabled: true }]
+    const res = apply(filters, log)
+    expect(res.split('\n').join(' ')).toEqual('20 15 10 3 2 1')
 })

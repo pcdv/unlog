@@ -36,7 +36,8 @@ class Replace {
 }
 
 const TIME_FORMATS = [
-  /....-..-.. ..:..:..[.,].../
+  /....-..-.. ..:..:..[.,].../,
+  /..:..:..[.,].../
 ]
 
 function guessTimeFormat(lines) {
@@ -52,7 +53,7 @@ import moment from 'moment'
 
 function append(res, from, to, val, step, fillZeros) {
   while (from < to) {
-    const ts = moment(from * step).format('hh:mm:ss')+","+((from*step) % 1000)
+    const ts = moment(from * step).format('HH:mm:ss')+","+((from*step) % 1000)
     res.push(`${ts};${val}`)
     from += 1
     if (fillZeros)

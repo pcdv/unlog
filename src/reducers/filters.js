@@ -1,6 +1,10 @@
 import * as ACTION from '../constants/actions'
 
-export default function filters(state = [], action) {
+const initialState = [
+  {type: 'cat', enabled: true}
+]
+
+export default function filters(state = initialState, action) {
   switch (action.type) {
 
     case ACTION.SET_FILTERS:

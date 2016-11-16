@@ -1,9 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import InputText from '../components/InputText'
+import TextArea from '../components/TextArea'
 import Checkbox from '../components/Checkbox'
-import { addFilter, updateFilter, deleteFilter, upFilter, downFilter } from '../actions/filterActions'
+import { addFilter, updateFilter, deleteFilter, upFilter, downFilter, loadFile } from '../actions/filterActions'
 import enumerate from '../util/enumerate'
+import FileInput from '../forks/react-simple-file-input'
+
 
 const Filters = ({filters, addFilter}) => (
   <span>
@@ -29,24 +32,51 @@ function getComponentForFilter(filter) {
 
 function getComponentForFilter0(filter) {
   switch (filter.type) {
+    case "cat":
+      return <Cat filter={filter} />
+    case "text":
+      return <Text filter={filter} />
     case "include":
     case "exclude":
-      return <IncludeExclude key={filter.index} filter={filter} />
+      return <Grep filter={filter} />
     case "replace":
-      return <ReplaceFilter key={filter.index} filter={filter} />
+      return <ReplaceFilter filter={filter} />
     case "throughput":
-      return <ThroughputFilter key={filter.index} filter={filter} />
+      return <ThroughputFilter filter={filter} />
+    case "sort":
+      return <SortFilter filter={filter} />
     default:
-      return <span/>
+      return <span />
   }
 }
 
-const _IncludeExclude = ({filter, placeholder, updateFilter }) => (
-  <InputText placeholder={placeholder}
+
+const _Grep = ({filter, placeholder, updateFilter }) => (
+  <InputText placeholder={placeholder} size={70}
     value={filter.pattern}
     onChange={s => updateFilter(filter.index, { pattern: s })} />
 )
-const IncludeExclude = connect(null, { updateFilter })(_IncludeExclude)
+const Grep = connect(null, { updateFilter })(_Grep)
+
+
+const _Text = ({filter, updateFilter }) => (
+  <TextArea
+    value={filter.text}
+    onChange={s => updateFilter(filter.index, { text: s })} />
+)
+const Text = connect(null, { updateFilter })(_Text)
+
+const _Cat = ({filter, updateFilter, loadFile }) => (
+  <span>
+    {name
+      ? <button onClick={updateFilter(filter.index, {text: '', name: undefined})}>Close file</button>
+      : <FileInput onChange={file => loadFile(filter.index, file)}>
+        <button>Select file2...</button>
+      </FileInput>}
+  </span>
+)
+const Cat = connect(null, { updateFilter, loadFile })(_Cat)
+
 
 const _ReplaceFilter = ({filter, updateFilter }) => (
   <span>
@@ -60,21 +90,31 @@ const _ReplaceFilter = ({filter, updateFilter }) => (
 )
 const ReplaceFilter = connect(null, { updateFilter })(_ReplaceFilter)
 
+const _SortFilter = ({filter, updateFilter }) => (
+  <span>
+    <Checkbox checked={filter.reverse} onChange={s => updateFilter(filter.index, { reverse: s })} >Reverse</Checkbox>
+    <Checkbox checked={filter.numeric} onChange={s => updateFilter(filter.index, { numeric: s })} >Numeric</Checkbox>
+    <Checkbox checked={filter.unique} onChange={s => updateFilter(filter.index, { unique: s })} >Unique</Checkbox>
+  </span>
+)
+const SortFilter = connect(null, { updateFilter })(_SortFilter)
+
 const _ThroughputFilter = ({filter, updateFilter}) => (
   <span>
-    Sampling period (ms):
+    Period (ms):
     <InputText
       value={filter.period} size={4}
       onChange={s => updateFilter(filter.index, { period: Number.parseInt(s, 10) })} />
+    Time unit (ms):
+    <InputText
+      placeholder="1000"
+      value={filter.unit} size={4}
+      onChange={s => updateFilter(filter.index, { unit: Number.parseInt(s, 10) })} />
     <InputText
       placeholder="Regexp to extract weight"
       value={filter.weight} size={30}
       onChange={s => updateFilter(filter.index, { weight: s })} />
-    Fill zeros:
-    <InputText
-      placeholder="y/n"
-      value={filter.fillZeros} size={1}
-      onChange={s => updateFilter(filter.index, { fillZeros: s })} />
+    <Checkbox checked={filter.fillZeros} onChange={s => updateFilter(filter.index, { fillZeros: s })} >Fill zeros</Checkbox>
   </span>
 )
 const ThroughputFilter = connect(null, { updateFilter })(_ThroughputFilter)
@@ -92,16 +132,19 @@ const DownFilter = connect(null, { downFilter })(
 )
 
 const EnableFilter = connect(null, { updateFilter })(
-  ({filter, updateFilter}) => <Checkbox checked={filter.enabled} onChange={enabled => updateFilter(filter.index, {enabled})}>Enabled</Checkbox>
+  ({filter, updateFilter}) => <Checkbox checked={filter.enabled} onChange={enabled => updateFilter(filter.index, { enabled })}></Checkbox>
 )
 
 const _ChooseType = ({filter, updateFilter}) => (
   <select value={filter.type || 'invalid'} onChange={e => updateFilter(filter.index, { type: e.target.value })}>
     <option></option>
+    <option value="cat">cat</option>
+    <option value="text">text</option>
     <option value="include">grep</option>
     <option value="exclude">grep -v</option>
     <option value="replace">replace</option>
     <option value="throughput">throughput</option>
+    <option value="sort">sort</option>
     <option value="show">show</option>
   </select>
 )

@@ -14,6 +14,14 @@ export function updateQuery() {
   }
 }
 
+export function loadFile(index, file) {
+  return (dispatch, getState) => {
+    const reader = new FileReader(file)
+    reader.onload = (event) => dispatch(updateFilter(index, {file, text: event.target.result}))
+    reader.readAsText(file)
+  }
+}
+
 export function initFilters() {
   return (dispatch, getState) => {
     const query = getState().routing.locationBeforeTransitions.query
