@@ -50,11 +50,13 @@ function getComponentForFilter0(filter) {
   }
 }
 
-
 const _Grep = ({filter, placeholder, updateFilter }) => (
-  <InputText placeholder={placeholder} size={70}
-    value={filter.pattern}
-    onChange={s => updateFilter(filter.index, { pattern: s })} />
+  <span>
+    <InputText placeholder={placeholder} size={70}
+      value={filter.pattern}
+      onChange={s => updateFilter(filter.index, { pattern: s })} />
+    <Checkbox checked={filter.ignoreCase} onChange={s => updateFilter(filter.index, { ignoreCase: s })} >Ignore case</Checkbox>
+  </span>
 )
 const Grep = connect(null, { updateFilter })(_Grep)
 
@@ -69,7 +71,7 @@ const Text = connect(null, { updateFilter })(_Text)
 const _Cat = ({filter, updateFilter, loadFile }) => (
   <span>
     {filter.file
-      ? <button onClick={() => updateFilter(filter.index, {text: '', file: undefined})}>Close file</button>
+      ? <button onClick={() => updateFilter(filter.index, { text: '', file: undefined })}>Close file</button>
       : <FileInput onChange={file => loadFile(filter.index, file)}>
         <button>Select file2...</button>
       </FileInput>}
