@@ -84,14 +84,14 @@ it('supports HH:mm:ss,SSS', () => {
 
 it('gives useful feedback when time cannot be parsed', () => {
     const filters = [{ type: 'throughput', period: 5000, enabled: true }]
-    expect(apply(filters, 'foo\nbar')).toEqual('Could not guess time format')
+    expect(apply(filters, 'foo\nbar')).toEqual('Error: Could not guess time format')
 })
 
 it('WTF', () => {
     const filters = [{ type: 'throughput', period: 1000, enabled: true }]
     expect(apply(filters, `
 eeeeeeeeee 2016-11-01 10:13:21,687 MM3     13 12 12 11 10 9 9
-eeeeeeeeee 2016-11-01 10:13:21,687 MM2     13 11 10 10 9 8`)).toEqual('Could not guess time format')
+eeeeeeeeee 2016-11-01 10:13:21,687 MM2     13 11 10 10 9 8`)).toEqual('Error: Could not guess time format')
 })
 
 it('sorts numeric values', () => {
@@ -100,3 +100,11 @@ it('sorts numeric values', () => {
     const res = apply(filters, log)
     expect(res.split('\n').join(' ')).toEqual('20 15 10 3 2 1')
 })
+
+it('calculates roundtrip', () => {
+    const filters = [{ type: 'roundtrip', start: 'start id=(\\w+)', stop: 'stop id=(\\w+)', enabled: true }]
+    expect(apply(filters, `
+2016-11-01 10:13:21,687 MM3     start id=toto
+2016-11-01 10:13:21,692 MM2     stop id=toto`)).toEqual('Start timestamp;Stop timestamp;Start;Stop;Roundtrip;ID\n1477991601687;1477991601692;2016-11-01 10:13:21,687;2016-11-01 10:13:21,692;5;toto')
+})
+

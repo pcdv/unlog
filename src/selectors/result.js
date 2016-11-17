@@ -20,27 +20,29 @@ const getSettings = state => {
   return state.settings
 }
 
+function chainPipes(filters) {
+  return filters.reduce((previous, filter) => {
+    const pipeClass = getProcessor(filter)
+    return new pipeClass(filter, previous)
+  }, undefined)
+}
+
 export const getResult = createDeepEqualSelector(
-  getValidFilters, getSettings,
-  (filters, settings) => {
+  getValidFilters, getSettings, (filters, settings) => {
 
-    if (!filters.length)
-      return { text: 'No pipes' }
+    let lines
+    try {
+      if (!filters.length)
+        throw new Error('No pipes')
 
-    let previousPipe
-
-    const pipes = filters.map(filter => {
-      const pipeClass = getProcessor(filter)
-      const pipe = new pipeClass(filter, previousPipe) 
-      previousPipe = pipe
-      return pipe
-    })
-
-    const last = pipes[pipes.length - 1]
-    
-    if (!last.getOutput)
-      throw new Error('Invalid pipe implementation: '+last.constructor.name)
-    const lines = last.getOutput('lines')
+      const last = chainPipes(filters)
+      if (!last.getOutput)
+        throw new Error('Invalid pipe implementation: ' + last.constructor.name)
+      lines = last.getOutput('lines')
+    }
+    catch (error) {
+      lines = [error]
+    }
 
     const linesDropped = lines.length <= settings.maxLines ? 0 : lines.length - settings.maxLines
     const res = lines.slice(0, settings.maxLines).join('\n')

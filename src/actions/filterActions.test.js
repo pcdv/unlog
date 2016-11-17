@@ -2,7 +2,7 @@ import {escapeJsonArray, toJsonArray} from './filterActions'
 
 it ('serializes replace rules', () => {
   const rule = {
-    pattern: 'foo++',
+    pattern: 'foo++\\S+',
     replace: 'bar++'
   }
 

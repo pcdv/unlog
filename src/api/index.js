@@ -5,6 +5,7 @@ import Replace from './replace'
 import Sort from './sort'
 import Dummy from './dummy'
 import Text from './text'
+import Roundtrip from './roundtrip'
 
 export function getProcessor(filter) {
   switch (filter.type) {
@@ -16,6 +17,8 @@ export function getProcessor(filter) {
       return Replace
     case "throughput":
       return Throughput
+    case "roundtrip":
+      return Roundtrip
     case "sort":
       return Sort
     case "cat":

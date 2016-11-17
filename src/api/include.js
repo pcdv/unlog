@@ -6,10 +6,6 @@ export default class Include extends Pipe {
     return !!filter.pattern
   }
 
-  getOutput(type) {
-    return this.compute(this.previous.getOutput(type))
-  }
-
   compute(lines) {
     if (this.pattern) {
       let flags = ''

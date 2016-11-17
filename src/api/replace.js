@@ -2,8 +2,8 @@ import Pipe from './pipe'
 
 export default class Replace extends Pipe {
 
-  getOutput(type) {
-    return this.compute(this.previous.getOutput(type))
+  static isValid(filter) {
+    return !!filter.pattern
   }
 
   compute(lines) {

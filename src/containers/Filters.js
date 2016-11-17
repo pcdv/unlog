@@ -43,6 +43,8 @@ function getComponentForFilter0(filter) {
       return <ReplaceFilter filter={filter} />
     case "throughput":
       return <ThroughputFilter filter={filter} />
+    case "roundtrip":
+      return <Roundtrip filter={filter}/>
     case "sort":
       return <SortFilter filter={filter} />
     default:
@@ -91,6 +93,18 @@ const _ReplaceFilter = ({filter, updateFilter }) => (
   </span>
 )
 const ReplaceFilter = connect(null, { updateFilter })(_ReplaceFilter)
+
+const _Roundtrip = ({filter, updateFilter }) => (
+  <span>
+    <InputText placeholder="Start regex with one capturing group to identify ID"
+      value={filter.start} size={70}
+      onChange={s => updateFilter(filter.index, { start: s })} />
+    <InputText placeholder="Stop regex"
+      value={filter.stop} size={35}
+      onChange={s => updateFilter(filter.index, { stop: s })} />
+  </span>
+)
+const Roundtrip = connect(null, { updateFilter })(_Roundtrip)
 
 const _SortFilter = ({filter, updateFilter }) => (
   <span>
@@ -146,6 +160,7 @@ const _ChooseType = ({filter, updateFilter}) => (
     <option value="exclude">grep -v</option>
     <option value="replace">replace</option>
     <option value="throughput">throughput</option>
+    <option value="roundtrip">roundtrip</option>
     <option value="sort">sort</option>
     <option value="show">show</option>
   </select>
