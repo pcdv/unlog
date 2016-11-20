@@ -12,3 +12,10 @@ export default function configureStore(initialState) {
 
   return store;
 }
+
+export function configureTestStore(initialState) {
+  let store = createStore(rootReducer, initialState, compose(
+    applyMiddleware(thunkMiddleware)))
+
+  return store;
+}

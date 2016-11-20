@@ -20,6 +20,12 @@ const getSettings = state => {
   return state.settings
 }
 
+let computeIterations = 0
+
+export function getIterationCount() {
+  return computeIterations
+}
+
 function chainPipes(filters) {
   return filters.reduce((previous, filter) => {
     const pipeClass = getProcessor(filter)
@@ -29,6 +35,7 @@ function chainPipes(filters) {
 
 export const getResult = createDeepEqualSelector(
   getValidFilters, getSettings, (filters, settings) => {
+    computeIterations++
 
     let lines
     try {
@@ -39,7 +46,7 @@ export const getResult = createDeepEqualSelector(
 
       if (!last.getOutput)
         throw new Error('Invalid pipe implementation: ' + last.constructor.name)
-        
+
       lines = last.getOutput('lines')
     }
     catch (error) {

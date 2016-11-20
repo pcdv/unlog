@@ -1,12 +1,10 @@
 import { getResult } from '../selectors/result'
-import { replaceLogFile } from '../actions/fileSelection'
 import { setFilters } from '../actions/filterActions'
 import configureStore from '../store/configureStore'
 
 function apply(filters, text) {
     const store = configureStore()
     const file = {type: 'text', text, enabled: true}
-    store.dispatch(replaceLogFile({ name: 'foo' }, text))
     store.dispatch(setFilters([file].concat(filters)))
     return getResult(store.getState()).text
 }
