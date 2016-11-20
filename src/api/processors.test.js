@@ -92,7 +92,7 @@ eeeeeeeeee 2016-11-01 10:13:21,687 MM3     13 12 12 11 10 9 9
 eeeeeeeeee 2016-11-01 10:13:21,687 MM2     13 11 10 10 9 8`)).toEqual('Error: Could not guess time format')
 })
 
-it('sorts numeric values', () => {
+it('sorts numeric values with reverse and unique flags', () => {
     const log = [1, 3, 10, 15, 20, 10, 2].join('\n')
     const filters = [{ type: 'sort', numeric: true, unique: true, reverse: true, enabled: true }]
     const res = apply(filters, log)

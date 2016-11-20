@@ -2,17 +2,16 @@ import Pipe from './pipe'
 
 export default class Sort extends Pipe {
   compute(lines) {
-    const filter = this
     let sortFunc 
 
-    if (filter.numeric)
+    if (this.numeric)
       sortFunc = (a, b) => Number.parseInt(a, 10) < Number.parseInt(b, 10) ? -1 : 1
     else
       sortFunc = (a, b) => a < b ? -1 : 1
     
     lines = lines.slice().sort(sortFunc)
 
-    if (filter.unique) {
+    if (this.unique) {
       let last
       lines = lines.filter(i => {
         const keep = last !== i
@@ -21,7 +20,7 @@ export default class Sort extends Pipe {
       })
     }
 
-    if (filter.reverse)
+    if (this.reverse)
       lines.reverse()
 
     return lines
