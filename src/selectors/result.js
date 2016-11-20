@@ -36,8 +36,10 @@ export const getResult = createDeepEqualSelector(
         throw new Error('No pipes')
 
       const last = chainPipes(filters)
+
       if (!last.getOutput)
         throw new Error('Invalid pipe implementation: ' + last.constructor.name)
+        
       lines = last.getOutput('lines')
     }
     catch (error) {

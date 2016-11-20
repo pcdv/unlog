@@ -1,6 +1,5 @@
 import Throughput from './throughput'
-import Include from './include'
-import Exclude from './exclude'
+import Grep from './grep'
 import Replace from './replace'
 import Sort from './sort'
 import Dummy from './dummy'
@@ -10,9 +9,11 @@ import Roundtrip from './roundtrip'
 export function getProcessor(filter) {
   switch (filter.type) {
     case "include":
-      return Include
+    case "grep":
+      return Grep
     case "exclude":
-      return Exclude
+      filter.invert = true
+      return Grep
     case "replace":
       return Replace
     case "throughput":
@@ -25,7 +26,7 @@ export function getProcessor(filter) {
     case "text":
       return Text
     default:
-    console.warn('Unknown filter: '+filter.type)
+      console.warn('Unknown filter: ' + filter.type)
       return Dummy
   }
 }

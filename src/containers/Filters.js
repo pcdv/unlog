@@ -37,6 +37,7 @@ function getComponentForFilter0(filter) {
     case "text":
       return <Text filter={filter} />
     case "include":
+    case "grep":
     case "exclude":
       return <Grep filter={filter} />
     case "replace":
@@ -58,6 +59,7 @@ const _Grep = ({filter, placeholder, updateFilter }) => (
       value={filter.pattern}
       onChange={s => updateFilter(filter.index, { pattern: s })} />
     <Checkbox checked={filter.ignoreCase} onChange={s => updateFilter(filter.index, { ignoreCase: s })} >Ignore case</Checkbox>
+    <Checkbox checked={filter.invert} onChange={s => updateFilter(filter.index, { invert: s })} >Invert match</Checkbox>
   </span>
 )
 const Grep = connect(null, { updateFilter })(_Grep)
@@ -156,8 +158,7 @@ const _ChooseType = ({filter, updateFilter}) => (
     <option></option>
     <option value="cat">cat</option>
     <option value="text">text</option>
-    <option value="include">grep</option>
-    <option value="exclude">grep -v</option>
+    <option value="grep">grep</option>
     <option value="replace">replace</option>
     <option value="throughput">throughput</option>
     <option value="roundtrip">roundtrip</option>
