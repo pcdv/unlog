@@ -50,8 +50,8 @@ export const getResult = createDeepEqualSelector(
       last.exec(context)
     }
     catch (error) {
-      console.error(error)
-      context.addError(""+error)
+      //console.error(error)
+      context.addError(error)
     }
 
     return context

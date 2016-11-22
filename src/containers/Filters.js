@@ -44,6 +44,8 @@ function getComponentForFilter0(filter) {
       return <ReplaceFilter filter={filter} />
     case "throughput":
       return <ThroughputFilter filter={filter} />
+    case "sample":
+      return <SampleFilter filter={filter} />
     case "roundtrip":
       return <Roundtrip filter={filter}/>
     case "sort":
@@ -130,12 +132,37 @@ const _ThroughputFilter = ({filter, updateFilter}) => (
       onChange={s => updateFilter(filter.index, { unit: Number.parseInt(s, 10) })} />
     <InputText
       placeholder="Regexp to extract weight"
-      value={filter.weight} size={30}
-      onChange={s => updateFilter(filter.index, { weight: s })} />
+      value={filter.valuePattern} size={30}
+      onChange={s => updateFilter(filter.index, { valuePattern: s })} />
     <Checkbox checked={filter.fillZeros} onChange={s => updateFilter(filter.index, { fillZeros: s })} >Fill zeros</Checkbox>
   </span>
 )
 const ThroughputFilter = connect(null, { updateFilter })(_ThroughputFilter)
+
+const _SampleFilter = ({filter, updateFilter}) => (
+  <span>
+    Period (ms):
+    <InputText
+      value={filter.period} size={4}
+      onChange={s => updateFilter(filter.index, { period: Number.parseInt(s, 10) })} />
+    Time unit (ms):
+    <InputText
+      placeholder="1000"
+      value={filter.unit} size={4}
+      onChange={s => updateFilter(filter.index, { unit: Number.parseInt(s, 10) })} />
+    <InputText
+      placeholder="min, max, throughput, sum"
+      value={filter.functions} size={20}
+      onChange={functions => updateFilter(filter.index, { functions })} />
+    <InputText
+      placeholder="Regexp to extract weight"
+      value={filter.valuePattern} size={30}
+      onChange={s => updateFilter(filter.index, { valuePattern: s })} />
+    <Checkbox checked={filter.fillZeros} onChange={s => updateFilter(filter.index, { fillZeros: s })} >Fill zeros</Checkbox>
+  </span>
+)
+const SampleFilter = connect(null, { updateFilter })(_SampleFilter)
+
 
 const DeleteFilter = connect(null, { deleteFilter })(
   ({filter, deleteFilter}) => <button onClick={s => deleteFilter(filter.index)}>Delete</button>
@@ -161,6 +188,7 @@ const _ChooseType = ({filter, updateFilter}) => (
     <option value="grep">grep</option>
     <option value="replace">replace</option>
     <option value="throughput">throughput</option>
+    <option value="sample">sample</option>
     <option value="roundtrip">roundtrip</option>
     <option value="sort">sort</option>
     <option value="show">show</option>

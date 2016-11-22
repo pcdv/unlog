@@ -1,4 +1,3 @@
-import Throughput from './throughput'
 import Grep from './grep'
 import Replace from './replace'
 import Sort from './sort'
@@ -6,6 +5,7 @@ import Dummy from './dummy'
 import Text from './text'
 import Roundtrip from './roundtrip'
 import Show from './show'
+import Sample from './sample'
 
 export const Context = require('./context')['default']
 
@@ -20,7 +20,10 @@ export function getProcessor(filter) {
     case "replace":
       return Replace
     case "throughput":
-      return Throughput
+      filter.functions = "throughput"
+      return Sample
+    case "sample":
+      return Sample
     case "roundtrip":
       return Roundtrip
     case "sort":

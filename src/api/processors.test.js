@@ -3,7 +3,12 @@ import { setFilters } from '../actions/filterActions'
 import configureStore from '../store/configureStore'
 
 function computeText(filters, text) {
-  return compute(filters, text).visualisations[0].text
+  const res = compute(filters, text)
+  if (res.errors.length) {
+    console.log(res.errors[0])
+    throw res.errors[0]
+  }
+  return res.visualisations[0].text
 }
 
 function compute(filters, text) {
@@ -63,12 +68,30 @@ it('fills zeros', () => {
 10:13:25;1`)
 })
 
-it('calculates weight', () => {
-  const filters = [{ type: 'throughput', period: 1000, weight: '.*MM1 (\\d+) .*', enabled: true }]
+it('can chain a throughput and a sample / min / max', () => {
+  const filters = [
+    { type: 'throughput', period: 1000, enabled: true },
+    { type: 'sample', period: 5000, functions: 'min max', enabled: true },
+  ]
+  expect(computeText(filters, log)).toEqual(`Time;min;max
+10:13:20;0;5
+10:13:25;1;1`)
+})
+
+it('calculates weight using valuePattern', () => {
+  const filters = [{ type: 'throughput', period: 1000, valuePattern: '.*MM1 (\\d+) .*', enabled: true }]
   expect(computeText(filters, log)).toEqual(`Time;Throughput
 10:13:21;8
 10:13:23;24
 10:13:25;3`)
+})
+
+it('calculates sum', () => {
+  const filters = [{ type: 'sample', period: 1000, valuePattern: '.*MM1 (\\d+) .*', functions: "sum min max", enabled: true }]
+  expect(computeText(filters, log)).toEqual(`Time;sum;min;max
+10:13:21;8;2;6
+10:13:23;24;1;10
+10:13:25;3;3;3`)
 })
 
 it('supports weird periods', () => {
@@ -88,14 +111,14 @@ it('supports HH:mm:ss,SSS', () => {
 
 it('gives useful feedback when time cannot be parsed', () => {
   const filters = [{ type: 'throughput', period: 5000, enabled: true }]
-  expect(compute(filters, 'foo\nbar').errors[0]).toEqual('Error: Could not guess time format')
+  expect(compute(filters, 'foo\nbar').errors[0]+'').toEqual('Error: Could not guess time format')
 })
 
 it('WTF', () => {
   const filters = [{ type: 'throughput', period: 1000, enabled: true }]
   expect(compute(filters, `
 eeeeeeeeee 2016-11-01 10:13:21,687 MM3     13 12 12 11 10 9 9
-eeeeeeeeee 2016-11-01 10:13:21,687 MM2     13 11 10 10 9 8`).errors[0]).toEqual('Error: Could not guess time format')
+eeeeeeeeee 2016-11-01 10:13:21,687 MM2     13 11 10 10 9 8`).errors[0]+'').toEqual('Error: Could not guess time format')
 })
 
 it('sorts numeric values with reverse and unique flags', () => {
