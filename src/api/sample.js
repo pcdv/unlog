@@ -2,6 +2,10 @@ import moment from 'moment'
 import Pipe from './pipe'
 import guessTimeFormat from '../util/guessTimeFormat'
 
+function sumArray(arr) {
+  return arr.reduce((prev, cur) => prev + cur, 0)
+}
+
 const FUNCTIONS = {
   min: {
     name: 'min',
@@ -13,14 +17,15 @@ const FUNCTIONS = {
   },
   sum: {
     name: 'sum',
-    apply: arr => arr.reduce((prev, cur) => prev + cur, 0)
+    apply: sumArray,
+  },
+  avg: {
+    name: 'Average',
+    apply: arr => sumArray(arr) / arr.length
   },
   throughput: {
     name: 'Throughput',
-    apply: (arr, filter) =>  {
-      const val = arr.reduce((prev, cur) => prev + cur, 0) // sum
-      return val * (filter.unit || 1000) / (filter.period || 1000)
-    },
+    apply: (arr, filter) => sumArray(arr) * (filter.unit || 1000) / (filter.period || 1000)
   }
 }
 
@@ -45,7 +50,7 @@ export default class Sample extends Pipe {
 
   constructor(filter, previous) {
     super(filter, previous)
-    this.functions = this.functions.split(/[\s,]+/).map(name => FUNCTIONS[name]).filter(func => func)
+    this.functions = (this.functions || '').split(/[\s,]+/).map(name => FUNCTIONS[name]).filter(func => func)
   }
 
   getOutput(type) {
@@ -62,8 +67,8 @@ export default class Sample extends Pipe {
   computeCSV(lines) {
     const intervals = this.computeIntervals(lines)
 
-    const header = ([ "Time"].concat(this.functions.map(f => f.name))).join(";")
-    
+    const header = (["Time"].concat(this.functions.map(f => f.name))).join(";")
+
     const timeFormat = this.period >= 1000 ? 'HH:mm:ss' : 'HH:mm:ss,SSS'
 
     const res = [header].concat(intervals.map(interval => {
@@ -83,7 +88,7 @@ export default class Sample extends Pipe {
 
     if (!lines.length)
       return []
-    const format = guessTimeFormat(lines)
+    const [format, timeLength] = guessTimeFormat(lines)
 
     if (!format)
       throw new Error('Could not guess time format')
@@ -92,7 +97,7 @@ export default class Sample extends Pipe {
     let currentInterval, roundedTime
 
     lines.forEach(line => {
-      const sub = line.substring(0, format.length)
+      const sub = line.substring(0, timeLength)
       const time = moment(sub, format).valueOf()
       if (time) {
         roundedTime = Math.trunc(time / period) * period

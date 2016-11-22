@@ -71,10 +71,10 @@ it('fills zeros', () => {
 it('can chain a throughput and a sample / min / max', () => {
   const filters = [
     { type: 'throughput', period: 1000, enabled: true },
-    { type: 'sample', period: 5000, functions: 'min max', enabled: true },
+    { type: 'sample', period: 5000, functions: 'min max', valuePattern: '.*;(.*)', enabled: true },
   ]
   expect(computeText(filters, log)).toEqual(`Time;min;max
-10:13:20;0;5
+10:13:20;2;5
 10:13:25;1;1`)
 })
 

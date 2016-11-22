@@ -29,7 +29,7 @@ export default class Throughput extends Pipe {
 
     if (!lines.length)
       return []
-    const format = guessTimeFormat(lines)
+    const [format, timeLength] = guessTimeFormat(lines)
 
     if (!format)
       throw new Error('Could not guess time format')
@@ -39,7 +39,7 @@ export default class Throughput extends Pipe {
     const reqs = {}
 
     lines.forEach(line => {
-      const sub = line.substring(0, format.length)
+      const sub = line.substring(0, timeLength)
       const time = moment(sub, format).valueOf()
       if (time) {
         let match = start.exec(line)

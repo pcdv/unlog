@@ -11,7 +11,7 @@ class Result extends Component {
 
     return (
       <div>
-        {result.errors.map(e => <pre>{e}</pre>)}
+        {result.errors.map(e => <pre key={e+""}>{""+e.stack}</pre>)}
         {enumerate(result.visualisations).map(viz => getViz(viz))}
       </div>
     );
