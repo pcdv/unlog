@@ -10,7 +10,8 @@ function check(store, count) {
 it("should not recompute when adding incomplete filter", () => {
   const store = configureTestStore()
   const file = { type: 'text', text: 'foobar', enabled: true }
-  store.dispatch(setFilters([file]))
+  const show = { type: 'show', enabled: true}
+  store.dispatch(setFilters([file, show]))
   check(store, 1)
   store.dispatch(addFilter({type: 'grep', pattern: 'foo', enabled: true}))
   check(store, 2)

@@ -5,6 +5,9 @@ import Sort from './sort'
 import Dummy from './dummy'
 import Text from './text'
 import Roundtrip from './roundtrip'
+import Show from './show'
+
+export const Context = require('./context')['default']
 
 export function getProcessor(filter) {
   switch (filter.type) {
@@ -25,6 +28,8 @@ export function getProcessor(filter) {
     case "cat":
     case "text":
       return Text
+    case "show":
+      return Show
     default:
       console.warn('Unknown filter: ' + filter.type)
       return Dummy

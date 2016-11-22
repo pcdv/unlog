@@ -4,8 +4,9 @@ export default class Text extends Pipe {
   getOutput(type) {
     switch (type) {
       case 'lines':
-        if (this.text)
-          return this.text.split('\n')
+        const text = this._text || this.text
+        if (text)
+          return text.split('\n')
         else
           return ['No file loaded']
       default:

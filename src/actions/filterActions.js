@@ -2,13 +2,25 @@ import * as ACTION from '../constants/actions'
 import { replace } from 'react-router-redux'
 
 /**
+ * First use = avoid serializing full text in URL...
+ */
+function removePrivateFields(obj) {
+  var res = {}
+  for (var i in obj) {
+    if (i.charAt(0) !== '_')
+      res[i] = obj[i]
+  }
+  return res
+}
+
+/**
  * Copies current filter state into query.
  */
 export function updateQuery() {
   return (dispatch, getState) => {
     const {filters} = getState()
     const query = {
-      filters: escapeJsonArray(filters)
+      filters: escapeJsonArray(filters.map(removePrivateFields))
     }
     dispatch(replace({ query }))
   }
@@ -17,7 +29,7 @@ export function updateQuery() {
 export function loadFile(index, file) {
   return (dispatch, getState) => {
     const reader = new FileReader(file)
-    reader.onload = (event) => dispatch(updateFilter(index, {file, text: event.target.result}))
+    reader.onload = (event) => dispatch(updateFilter(index, {file, _text: event.target.result}))
     reader.readAsText(file)
   }
 }

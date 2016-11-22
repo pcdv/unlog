@@ -1,6 +1,6 @@
 import { createSelectorCreator, defaultMemoize } from 'reselect'
 import isEqual from 'lodash/isEqual'
-import { getProcessor } from '../api'
+import { getProcessor, Context } from '../api'
 
 // create a "selector creator" that uses lodash.isEqual instead of ===
 const createDeepEqualSelector = createSelectorCreator(
@@ -37,7 +37,7 @@ export const getResult = createDeepEqualSelector(
   getValidFilters, getSettings, (filters, settings) => {
     computeIterations++
 
-    let lines
+    const context = new Context(settings)
     try {
       if (!filters.length)
         throw new Error('No pipes')
@@ -47,16 +47,13 @@ export const getResult = createDeepEqualSelector(
       if (!last.getOutput)
         throw new Error('Invalid pipe implementation: ' + last.constructor.name)
 
-      lines = last.getOutput('lines')
+      last.exec(context)
     }
     catch (error) {
-      lines = [error]
+      console.error(error)
+      context.addError(""+error)
     }
 
-    const linesDropped = lines.length <= settings.maxLines ? 0 : lines.length - settings.maxLines
-    const res = lines.slice(0, settings.maxLines).join('\n')
-    const txt = res.length < settings.maxChars ? res : res.substring(0, settings.maxChars)
-    const charsDropped = res.length <= settings.maxChars ? 0 : res.length - txt.length
-    return { text: txt, charsDropped, linesDropped }
+    return context
   }
 )

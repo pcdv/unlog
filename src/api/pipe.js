@@ -8,14 +8,23 @@ export default class Pipe {
     return filter.enabled
   }
 
-  getInput(type) {
+  getPrevious() {
     if (!this.previous)
-      throw new Error('No previous pipe given to '+this.constructor.name)
-    return this.previous.getOutput(type)
+      throw new Error('No previous pipe given to ' + this.constructor.name)
+    return this.previous
+  }
+
+  getInput(type) {
+    return this.getPrevious().getOutput(type)
   }
 
   getOutput(type) {
+    //console.log(this)
     return this.compute(this.getInput(type))
+  }
+
+  exec(context) {
+
   }
 
   compute(data) {

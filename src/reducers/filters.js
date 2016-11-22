@@ -1,7 +1,8 @@
 import * as ACTION from '../constants/actions'
 
 const initialState = [
-  {type: 'cat', enabled: true}
+  {type: 'cat', enabled: true},
+  {type: 'show', enabled: true},
 ]
 
 export default function filters(state = initialState, action) {
