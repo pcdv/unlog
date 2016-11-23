@@ -6,6 +6,7 @@ import Text from './text'
 import Roundtrip from './roundtrip'
 import Show from './show'
 import Sample from './sample'
+import Chart from './chart'
 
 export const Context = require('./context')['default']
 
@@ -33,6 +34,8 @@ export function getProcessor(filter) {
       return Text
     case "show":
       return Show
+    case "chart":
+      return Chart
     default:
       console.warn('Unknown filter: ' + filter.type)
       return Dummy

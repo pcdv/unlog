@@ -50,6 +50,8 @@ function getComponentForFilter0(filter) {
       return <Roundtrip filter={filter}/>
     case "sort":
       return <SortFilter filter={filter} />
+    case "chart":
+      return <ChartFilter filter={filter} />
     default:
       return <span />
   }
@@ -97,6 +99,18 @@ const _ReplaceFilter = ({filter, updateFilter }) => (
   </span>
 )
 const ReplaceFilter = connect(null, { updateFilter })(_ReplaceFilter)
+
+const _ChartFilter = ({filter, updateFilter }) => (
+  <span>
+    <InputText placeholder="X key"
+      value={filter.x} size={70}
+      onChange={x => updateFilter(filter.index, { x })} />
+    <InputText placeholder="Y key"
+      value={filter.y} size={35}
+      onChange={y => updateFilter(filter.index, { y })} />
+  </span>
+)
+const ChartFilter = connect(null, { updateFilter })(_ChartFilter)
 
 const _Roundtrip = ({filter, updateFilter }) => (
   <span>
@@ -192,6 +206,7 @@ const _ChooseType = ({filter, updateFilter}) => (
     <option value="roundtrip">roundtrip</option>
     <option value="sort">sort</option>
     <option value="show">show</option>
+    <option value="chart">chart</option>
   </select>
 )
 

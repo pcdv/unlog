@@ -14,6 +14,7 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>
       <Route path="/" component={App}></Route>
+      <Route path="/unlog" component={App}></Route>
     </Router>
   </Provider>,
   document.getElementById('root')

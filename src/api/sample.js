@@ -58,7 +58,7 @@ export default class Sample extends Pipe {
       case 'lines':
         return this.computeCSV(this.getInput('lines'))
       case 'data':
-        return this.compute(this.getInput('lines')).map(i => ({ time: i[0], value: i[1] }))
+        return this.computeIntervals(this.getInput('lines'))
       default:
         throw new Error(type + '??')
     }

@@ -1,6 +1,6 @@
-import { getResult } from '../selectors/result'
-import { setFilters } from '../actions/filterActions'
-import configureStore from '../store/configureStore'
+import { getResult } from '../../selectors/result'
+import { setFilters } from '../../actions/filterActions'
+import configureStore from '../../store/configureStore'
 
 function computeText(filters, text) {
   const res = compute(filters, text)

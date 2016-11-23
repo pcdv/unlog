@@ -11,7 +11,7 @@ class Result extends Component {
 
     return (
       <div>
-        {result.errors.map(e => <pre key={e+""}>{""+e.stack}</pre>)}
+        {result.errors.map(e => <pre key={e + ""}>{"" + e.stack}</pre>)}
         {enumerate(result.visualisations).map(viz => getViz(viz))}
       </div>
     );
@@ -30,6 +30,8 @@ function getViz(viz) {
   switch (viz.type) {
     case "show":
       return <Show viz={viz} key={viz.index} />
+    case "chart":
+      return <Chart viz={viz} key={viz.index} />
     default:
       return <pre>Unknown viz {viz.type}</pre>
   }
@@ -44,3 +46,18 @@ const Show = ({viz}) => (
     {viz.text}
   </pre>
 )
+
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts'
+const Chart = ({viz}) => (
+  <LineChart width={600} height={300} data={viz.data}>
+    <Line type="monotone" dataKey={viz.filter.y} stroke="#8884d8" />
+    <CartesianGrid stroke="#ccc" />
+    <XAxis dataKey={viz.filter.x} />
+    <YAxis />
+  </LineChart>
+)
+/*
+
+quote
+%26%2327%3b)%3balert(42)
+*/
