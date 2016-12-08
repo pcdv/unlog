@@ -18,11 +18,12 @@ function removePrivateFields(obj) {
  */
 export function updateQuery() {
   return (dispatch, getState) => {
-    const {filters} = getState()
+    const {filters, routing} = getState()
+    const pathname = routing.locationBeforeTransitions ? routing.locationBeforeTransitions.pathname : ''
     const query = {
       filters: escapeJsonArray(filters.map(removePrivateFields))
     }
-    dispatch(replace({ query }))
+    dispatch(replace({ pathname, query }))
   }
 }
 

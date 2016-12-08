@@ -2,10 +2,27 @@ import moment from 'moment'
 import Pipe from './pipe'
 import guessTimeFormat from '../util/guessTimeFormat'
 
+const START_TS = 'start_ts'
+const STOP_TS = 'stop_ts'
+const START_STR = 'start_str'
+const STOP_STR = 'stop_str'
+const ROUNDTRIP = 'roundtrip'
+const ID = 'id'
+
+const COLUMNS = [START_TS, STOP_TS, START_STR, STOP_STR, ROUNDTRIP, ID]
+
+function toRow(item) {
+  return [item.start_ts, item.stop_ts, item.start_str, item.stop_str, item.roundtrip, item.id]
+}
+
 export default class Throughput extends Pipe {
 
   static isValid(filter) {
     return filter.start && filter.stop
+  }
+
+  getFields() {
+    return COLUMNS
   }
 
   getOutput(type) {
@@ -13,7 +30,7 @@ export default class Throughput extends Pipe {
       case 'lines':
         return this.computeCSV(this.getInput('lines'))
       case 'data':
-        return this.compute(this.getInput('lines')).map(i => ({ time: i[0], value: i[1] }))
+        return this.compute0(this.getInput('lines'))
       default:
         throw new Error(type + '??')
     }
@@ -21,7 +38,7 @@ export default class Throughput extends Pipe {
 
   computeCSV(lines) {
     const data = this.compute0(lines)
-    return ["Start timestamp;Stop timestamp;Start;Stop;Roundtrip;ID"].concat(data.map(item => item.join(";")))
+    return [COLUMNS.join(';'), ...data.map(item => toRow(item).join(";"))]
   }
 
   compute0(lines) {
@@ -55,7 +72,14 @@ export default class Throughput extends Pipe {
             const req = reqs[id]
             if (req) {
               const roundtrip = time - req.time
-              res.push([req.time, time, req.startStr, sub, roundtrip, req.id])
+              res.push({
+                [START_TS]: req.time,
+                [STOP_TS]: time,
+                [START_STR]: req.startStr,
+                [STOP_STR]: sub,
+                [ROUNDTRIP]: roundtrip,
+                [ID]: id
+              })
               delete reqs[id]
             }
           }

@@ -21,7 +21,32 @@ const log = `
 2016-11-01 10:13:25,416 MM1 3 0    13 13 12
 `
 
-it('generates valid data', () => {
+it('throughput generates valid data', () => {
   const filters = [{ type: 'throughput', period: 1000, enabled: true }]
-  expect(compute(filters, log).visualisations[0]).toEqual()
+  expect(compute(filters, log).visualisations[0].data).toEqual(
+    [
+      { "Throughput": 2, "start": 1477991601000, "values": [1, 1] },
+      { "Throughput": 5, "start": 1477991603000, "values": [1, 1, 1, 1, 1] },
+      { "Throughput": 1, "start": 1477991605000, "values": [1] }
+    ]
+  )
+})
+
+const log2 = `
+14:07:00,478 START ID=a
+14:07:00,481 STOP ID=a
+`
+
+it('roundtrip generates valid data', () => {
+  const filters = [{ type: 'roundtrip', start: 'START ID=(\\S+)', stop: 'STOP ID=(\\S+)', enabled: true }]
+  expect(compute(filters, log2).visualisations[0].data).toEqual(
+    [{
+      id: "a",
+      roundtrip: 3,
+      start_ts: 1481202420478,
+      start_str: "14:07:00,478",
+      stop_ts: 1481202420481,
+      stop_str: "14:07:00,481"
+    }]
+  )
 })

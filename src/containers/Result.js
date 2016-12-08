@@ -49,10 +49,10 @@ const Show = ({viz}) => (
 
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts'
 const Chart = ({viz}) => (
-  <LineChart width={600} height={300} data={viz.data}>
-    <Line type="monotone" dataKey={viz.filter.y} stroke="#8884d8" />
+  <LineChart width={parseInt(viz.filter.width || 600, 10)} height={300} data={viz.data}>
+    <Line type="monotone" dataKey={viz.filter.y} stroke="#8884d8" dot={false}/>
     <CartesianGrid stroke="#ccc" />
-    <XAxis dataKey={viz.filter.x} />
+    <XAxis dataKey={viz.filter.x} minTickGab={20}/>
     <YAxis />
   </LineChart>
 )

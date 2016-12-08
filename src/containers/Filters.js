@@ -3,8 +3,9 @@ import { connect } from 'react-redux'
 import InputText from '../components/InputText'
 import TextArea from '../components/TextArea'
 import Checkbox from '../components/Checkbox'
+import Select from '../components/Select'
 import { addFilter, updateFilter, deleteFilter, upFilter, downFilter, loadFile } from '../actions/filterActions'
-import enumerate from '../util/enumerate'
+import { getChainedFilters } from '../selectors/result'
 import FileInput from '../forks/react-simple-file-input'
 
 
@@ -15,7 +16,7 @@ const Filters = ({filters, addFilter}) => (
   </span>
 )
 
-export default connect(state => ({ filters: enumerate(state.filters) }), { addFilter })(Filters)
+export default connect(state => ({ filters: getChainedFilters(state) }), { addFilter })(Filters)
 
 function getComponentForFilter(filter) {
   return (
@@ -47,7 +48,7 @@ function getComponentForFilter0(filter) {
     case "sample":
       return <SampleFilter filter={filter} />
     case "roundtrip":
-      return <Roundtrip filter={filter}/>
+      return <Roundtrip filter={filter} />
     case "sort":
       return <SortFilter filter={filter} />
     case "chart":
@@ -100,16 +101,23 @@ const _ReplaceFilter = ({filter, updateFilter }) => (
 )
 const ReplaceFilter = connect(null, { updateFilter })(_ReplaceFilter)
 
-const _ChartFilter = ({filter, updateFilter }) => (
-  <span>
-    <InputText placeholder="X key"
-      value={filter.x} size={70}
-      onChange={x => updateFilter(filter.index, { x })} />
-    <InputText placeholder="Y key"
-      value={filter.y} size={35}
-      onChange={y => updateFilter(filter.index, { y })} />
-  </span>
-)
+const _ChartFilter = ({filter, updateFilter }) => {
+  let fields = []
+  try {
+    fields = filter._previous._processor.getFields()
+  }
+  catch (e) { }
+
+  return (
+    <span>
+      X: <Select value={filter.x} options={fields} onChange={x => updateFilter(filter.index, { x })}/>
+      Y: <Select value={filter.y} options={fields} onChange={y => updateFilter(filter.index, { y })}/>
+      <InputText placeholder="Width : 600"
+        value={filter.width} size={10}
+        onChange={width => updateFilter(filter.index, { width })} />
+    </span>
+  )
+}
 const ChartFilter = connect(null, { updateFilter })(_ChartFilter)
 
 const _Roundtrip = ({filter, updateFilter }) => (

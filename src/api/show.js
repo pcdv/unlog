@@ -22,4 +22,8 @@ export default class Show extends Pipe {
       linesDropped
     })
   }
+
+  getOutput(type) {
+    return this.getPrevious().getOutput(type)
+  }
 }

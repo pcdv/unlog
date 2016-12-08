@@ -23,6 +23,12 @@ export default class Pipe {
     return this.compute(this.getInput(type))
   }
 
+  getFields() {
+    if (this.previous)
+      return this.previous.getFields()
+    return []
+  }
+
   exec(context) {
 
   }

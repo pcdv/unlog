@@ -53,6 +53,10 @@ export default class Sample extends Pipe {
     this.functions = (this.functions || '').split(/[\s,]+/).map(name => FUNCTIONS[name]).filter(func => func)
   }
 
+  getFields() {
+    return [ "start", ...this.functions.map(f => f.name)]
+  }
+
   getOutput(type) {
     switch (type) {
       case 'lines':
@@ -146,9 +150,10 @@ export default class Sample extends Pipe {
    * Applies all configured functions to given interval.
    */
   computeInterval(interval) {
+    var res = Object.assign({}, interval)
     for (let func of this.functions) {
-      interval[func.name] = func.apply(interval.values, this)
+      res[func.name] = func.apply(interval.values, this)
     }
-    return interval
+    return res
   }
 }
