@@ -19,7 +19,7 @@ const TextArea: React.FC<TextAreaProps> = ({ value, orig, placeholder, title, st
 
   return (
     <textarea
-      value={String(localValue != null ? localValue : orig) || ''}
+      value={localValue != null ? localValue : orig ?? ''}
       placeholder={placeholder}
       title={title}
       style={style}

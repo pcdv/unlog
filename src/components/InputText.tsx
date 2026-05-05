@@ -20,7 +20,7 @@ const InputText: React.FC<InputTextProps> = ({ value, orig, placeholder, title, 
   return (
     <input
       type="text"
-      value={String(localValue != null ? localValue : orig) || ''}
+      value={localValue != null ? localValue : orig ?? ''}
       placeholder={placeholder}
       title={title}
       style={style}

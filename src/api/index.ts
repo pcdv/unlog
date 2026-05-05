@@ -41,7 +41,7 @@ export function getProcessor(filter: Filter): PipeConstructor & { isValid: (f: F
     case 'chart':
       return Chart
     default:
-      console.warn('Unknown filter: ' + filter.type)
+      if (filter.type) console.warn('Unknown filter: ' + filter.type)
       return Dummy
   }
 }
