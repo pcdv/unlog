@@ -107,5 +107,5 @@ pre {
   font-size: 11px;
   font-family: 'Consolas', 'Courier New', monospace;
   margin: 0;
-  white-space: pre;
+  white-space: pre-wrap;
 }
