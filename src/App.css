@@ -25,6 +25,32 @@
   flex-wrap: wrap;
 }
 
+.pipe-row--dragging {
+  opacity: 0.4;
+}
+
+.pipe-row--droptarget {
+  outline: 2px solid #4a90d9;
+  outline-offset: 1px;
+  border-radius: 3px;
+}
+
+.drag-handle {
+  cursor: grab;
+  padding: 0 2px;
+  color: #aaa;
+  font-size: 14px;
+  user-select: none;
+}
+
+.drag-handle:hover {
+  color: #555;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
 /* ── Buttons ─────────────────────────────────────────── */
 button {
   padding: 1px 7px;

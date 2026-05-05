@@ -1,13 +1,12 @@
 {
   "name": "unlog",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "homepage": "http://pcdv.github.io/unlog",
   "type": "module",
   "dependencies": {
     "@reduxjs/toolkit": "^2",
     "dayjs": "^1",
-    "gh-pages": "^6",
     "lodash": "^4",
     "react": "^19",
     "react-dom": "^19",
@@ -17,6 +16,7 @@
     "reselect": "^5"
   },
   "devDependencies": {
+    "gh-pages": "^6",
     "@types/lodash": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",

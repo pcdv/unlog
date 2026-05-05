@@ -85,6 +85,13 @@ export function downFilter(index: number) {
   }
 }
 
+export function moveFilter(from: number, to: number) {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: ACTION.MOVE_FILTER, from, to })
+    dispatch(updateQuery())
+  }
+}
+
 export function deleteFilter(index: number) {
   return (dispatch: AppDispatch) => {
     dispatch({ type: ACTION.DELETE_FILTER, index })

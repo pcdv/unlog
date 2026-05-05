@@ -7,6 +7,7 @@ interface UpdateFilterAction { type: typeof ACTION.UPDATE_FILTER; index: number;
 interface UpFilterAction { type: typeof ACTION.UP_FILTER; index: number }
 interface DownFilterAction { type: typeof ACTION.DOWN_FILTER; index: number }
 interface DeleteFilterAction { type: typeof ACTION.DELETE_FILTER; index: number }
+interface MoveFilterAction { type: typeof ACTION.MOVE_FILTER; from: number; to: number }
 
 type FiltersAction =
   | SetFiltersAction
@@ -15,6 +16,7 @@ type FiltersAction =
   | UpFilterAction
   | DownFilterAction
   | DeleteFilterAction
+  | MoveFilterAction
 
 const initialState: Filter[] = [
   { type: 'cat', enabled: true },
@@ -51,6 +53,13 @@ export default function filters(state: Filter[] = initialState, action: FiltersA
         state[action.index],
         ...state.slice(action.index + 2),
       ]
+
+    case ACTION.MOVE_FILTER: {
+      const next = [...state]
+      const [item] = next.splice(action.from, 1)
+      next.splice(action.to, 0, item)
+      return next
+    }
 
     case ACTION.DELETE_FILTER:
       if (action.index >= 0 && action.index < state.length)

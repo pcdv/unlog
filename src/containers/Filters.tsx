@@ -5,7 +5,7 @@ import TextArea from '../components/TextArea'
 import Checkbox from '../components/Checkbox'
 import Select from '../components/Select'
 import {
-  addFilter, updateFilter, deleteFilter, upFilter, downFilter, loadFile,
+  addFilter, updateFilter, deleteFilter, moveFilter, loadFile,
 } from '../actions/filterActions'
 import { getChainedFilters } from '../selectors/result'
 import FileInput from '../forks/react-simple-file-input'
@@ -17,6 +17,31 @@ const Filters: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const filters = useSelector((state: RootState) => getChainedFilters(state))
   const [folded, setFolded] = useState(false)
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dropIndex, setDropIndex] = useState<number | null>(null)
+
+  function handleDragStart(index: number) {
+    setDragIndex(index)
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault()
+    if (dragIndex !== null && dragIndex !== index)
+      setDropIndex(index)
+  }
+
+  function handleDrop(e: React.DragEvent, index: number) {
+    e.preventDefault()
+    if (dragIndex !== null && dragIndex !== index)
+      dispatch(moveFilter(dragIndex, index))
+    setDragIndex(null)
+    setDropIndex(null)
+  }
+
+  function handleDragEnd() {
+    setDragIndex(null)
+    setDropIndex(null)
+  }
 
   return (
     <div className="filters-panel">
@@ -29,18 +54,45 @@ const Filters: React.FC = () => {
           {folded ? `▶ ${filters.length} pipe${filters.length !== 1 ? 's' : ''}` : '▼ hide'}
         </button>
       </div>
-      {!folded && filters.map(filter => getComponentForFilter(filter, dispatch))}
+      {!folded && filters.map(filter => getComponentForFilter(filter, dispatch, {
+        isDragging: dragIndex === filter.index,
+        isDropTarget: dropIndex === filter.index,
+        onDragStart: () => handleDragStart(filter.index),
+        onDragOver: (e) => handleDragOver(e, filter.index),
+        onDrop: (e) => handleDrop(e, filter.index),
+        onDragEnd: handleDragEnd,
+      }))}
     </div>
   )
 }
 
 export default Filters
 
-function getComponentForFilter(filter: ChainedFilter, dispatch: AppDispatch) {
+interface DragProps {
+  isDragging: boolean
+  isDropTarget: boolean
+  onDragStart: () => void
+  onDragOver: (e: React.DragEvent) => void
+  onDrop: (e: React.DragEvent) => void
+  onDragEnd: () => void
+}
+
+function getComponentForFilter(filter: ChainedFilter, dispatch: AppDispatch, drag: DragProps) {
+  const classes = ['pipe-row', drag.isDragging && 'pipe-row--dragging', drag.isDropTarget && 'pipe-row--droptarget'].filter(Boolean).join(' ')
   return (
-    <div key={filter.index} className="pipe-row">
-      <button disabled={filter.index === 0} onClick={() => dispatch(upFilter(filter.index))} title="Move up">↑</button>
-      <button disabled={filter.isLast} onClick={() => dispatch(downFilter(filter.index))} title="Move down">↓</button>
+    <div
+      key={filter.index}
+      className={classes}
+      onDragOver={drag.onDragOver}
+      onDrop={drag.onDrop}
+    >
+      <span
+        className="drag-handle"
+        draggable
+        onDragStart={drag.onDragStart}
+        onDragEnd={drag.onDragEnd}
+        title="Drag to reorder"
+      >⠿</span>
       <button onClick={() => dispatch(deleteFilter(filter.index))} title="Delete">✕</button>
       <EnableFilter filter={filter} dispatch={dispatch} />
       <ChooseType filter={filter} dispatch={dispatch} />
