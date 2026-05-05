@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import InputText from '../components/InputText'
 import TextArea from '../components/TextArea'
@@ -16,12 +16,21 @@ import type Pipe from '../api/pipe'
 const Filters: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const filters = useSelector((state: RootState) => getChainedFilters(state))
+  const [folded, setFolded] = useState(false)
 
   return (
-    <span>
-      <button onClick={() => dispatch(addFilter())}>Add pipe</button>
-      {filters.map(filter => getComponentForFilter(filter, dispatch))}
-    </span>
+    <div className="filters-panel">
+      <div className="filters-toolbar">
+        <button onClick={() => dispatch(addFilter())}>Add pipe</button>
+        <button
+          onClick={() => setFolded(f => !f)}
+          title={folded ? 'Expand pipeline' : 'Collapse pipeline'}
+        >
+          {folded ? `▶ ${filters.length} pipe${filters.length !== 1 ? 's' : ''}` : '▼ hide'}
+        </button>
+      </div>
+      {!folded && filters.map(filter => getComponentForFilter(filter, dispatch))}
+    </div>
   )
 }
 
@@ -29,10 +38,10 @@ export default Filters
 
 function getComponentForFilter(filter: ChainedFilter, dispatch: AppDispatch) {
   return (
-    <div key={filter.index}>
-      <UpFilter filter={filter} dispatch={dispatch} />
-      <DownFilter filter={filter} dispatch={dispatch} />
-      <DeleteFilter filter={filter} dispatch={dispatch} />
+    <div key={filter.index} className="pipe-row">
+      <button disabled={filter.index === 0} onClick={() => dispatch(upFilter(filter.index))} title="Move up">↑</button>
+      <button disabled={filter.isLast} onClick={() => dispatch(downFilter(filter.index))} title="Move down">↓</button>
+      <button onClick={() => dispatch(deleteFilter(filter.index))} title="Delete">✕</button>
       <EnableFilter filter={filter} dispatch={dispatch} />
       <ChooseType filter={filter} dispatch={dispatch} />
       {getComponentForFilter0(filter, dispatch)}
@@ -185,18 +194,6 @@ const SampleFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
       onChange={s => dispatch(updateFilter(filter.index, { valuePattern: s }))} />
     <Checkbox checked={filter.fillZeros} onChange={s => dispatch(updateFilter(filter.index, { fillZeros: s }))}>Fill zeros</Checkbox>
   </span>
-)
-
-const DeleteFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
-  <button onClick={() => dispatch(deleteFilter(filter.index))}>Delete</button>
-)
-
-const UpFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
-  <button disabled={filter.index === 0} onClick={() => dispatch(upFilter(filter.index))}>Up</button>
-)
-
-const DownFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
-  <button disabled={filter.isLast} onClick={() => dispatch(downFilter(filter.index))}>Dn</button>
 )
 
 const EnableFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (

@@ -11,7 +11,7 @@ const Result: React.FC = () => {
   const result = useSelector((state: RootState) => getResult(state))
 
   return (
-    <div>
+    <div className="result-area">
       {result.errors.map((e, i) => <pre key={i}>{"" + (e as Error).stack}</pre>)}
       {enumerate(result.visualisations).map(viz => getViz(viz))}
     </div>
@@ -39,13 +39,14 @@ interface ShowViz extends Visualisation {
 }
 
 const Show: React.FC<{ viz: ShowViz }> = ({ viz }) => (
-  <pre>
-    <button onClick={() => download('out.csv', viz.text ?? '')}>Download as CSV</button>
-    <br />
-    {viz.charsDropped ? <h2>{viz.charsDropped} characters were truncated.</h2> : null}
-    {viz.linesDropped ? <h2>{viz.linesDropped} lines were truncated.</h2> : null}
-    {viz.text}
-  </pre>
+  <div>
+    <div className="result-toolbar">
+      <button onClick={() => download('out.csv', viz.text ?? '')}>Download as CSV</button>
+      {viz.charsDropped ? <span className="result-warn">{viz.charsDropped} characters were truncated.</span> : null}
+      {viz.linesDropped ? <span className="result-warn">{viz.linesDropped} lines were truncated.</span> : null}
+    </div>
+    <pre>{viz.text}</pre>
+  </div>
 )
 
 interface ChartViz extends Visualisation {

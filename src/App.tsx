@@ -22,6 +22,9 @@ const App: React.FC = () => {
     <div>
       <Filters />
       <Result />
+      <div style={{ position: 'fixed', bottom: 4, right: 8, fontSize: '0.7em', opacity: 0.4 }}>
+        v{__APP_VERSION__}
+      </div>
     </div>
   )
 }

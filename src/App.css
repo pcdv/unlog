@@ -1,28 +1,111 @@
-.App {
-  text-align: center;
+/* ── Filters panel (sticky header) ─────────────────── */
+.filters-panel {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #f0f2f5;
+  border-bottom: 1px solid #c8ccd2;
+  padding: 4px 8px;
+  font-size: 12px;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.filters-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 2px;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.pipe-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border-top: 1px solid #dde0e8;
+  flex-wrap: wrap;
 }
 
-.App-intro {
-  font-size: large;
+/* ── Buttons ─────────────────────────────────────────── */
+button {
+  padding: 1px 7px;
+  font-size: 11px;
+  border: 1px solid #bbb;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 3px;
+  line-height: 1.6;
+  white-space: nowrap;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+button:hover {
+  background: #e8eaf0;
+  border-color: #999;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ── Form controls ───────────────────────────────────── */
+input[type='text'],
+input:not([type]) {
+  font-size: 12px;
+  padding: 1px 5px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  height: 20px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #222;
+}
+
+input[type='text']:focus,
+input:not([type]):focus {
+  outline: none;
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.2);
+}
+
+select {
+  font-size: 12px;
+  padding: 1px 3px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  background: #fff;
+  color: #222;
+  height: 22px;
+}
+
+label {
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+/* ── Result area ─────────────────────────────────────── */
+.result-area {
+  padding: 4px 8px;
+}
+
+.result-toolbar {
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-warn {
+  color: #b00;
+  font-size: 12px;
 }
 
 pre {
-  font-size: 10px;
+  font-size: 11px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  margin: 0;
+  white-space: pre;
 }
