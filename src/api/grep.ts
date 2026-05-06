@@ -25,12 +25,32 @@ export default class Grep extends Pipe {
       let flags = ''
       if (this.ignoreCase)
         flags += 'i'
-      const re = new RegExp(this.pattern, flags)
+      let rePattern = this.pattern
+      
+      // Auto-anchor greedy match-all at the start to prevent O(N^2) catastrophic backtracking
+      if (rePattern.startsWith('.*')) {
+        rePattern = '^' + rePattern
+      }
+
+      let re: RegExp
+      try {
+        re = new RegExp(rePattern, flags)
+      } catch (e) {
+        return lines
+      }
+      
       const result: string[] = []
+      const t0 = Date.now()
+      let i = 0
+      
       for (const line of lines) {
         if (re.test(line) !== (this.invert ?? false)) {
           result.push(line)
           if (limit !== undefined && result.length >= limit) break
+        }
+        i++
+        if (i % 100 === 0 && Date.now() - t0 > 5000) {
+          throw new Error(`Grep filter timed out after 5s (catastrophic backtracking in /${this.pattern}/)`)
         }
       }
       return result
