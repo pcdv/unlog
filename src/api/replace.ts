@@ -10,7 +10,7 @@ export default class Replace extends Pipe {
   }
 
   static isValid(filter: Filter): boolean {
-    return !!filter.pattern
+    return !!(filter as Replace).pattern
   }
 
   compute(lines: string[]): string[] {

@@ -1,14 +1,14 @@
 import * as ACTION from '../constants/actions'
 import type { AppDispatch, RootState } from '../store/configureStore'
-import type { Filter } from '../types'
+import type { Filter, FilterUpdate } from '../types'
 
-function removePrivateFields(obj: Filter): Partial<Filter> {
+function removePrivateFields(obj: Filter): FilterUpdate {
   const res: Record<string, unknown> = {}
   for (const i in obj) {
     if (i.charAt(0) !== '_')
       res[i] = (obj as unknown as Record<string, unknown>)[i]
   }
-  return res as Partial<Filter>
+  return res as FilterUpdate
 }
 
 export function updateQuery() {
@@ -57,14 +57,14 @@ export function setFilters(filters: Filter[], qs: boolean) {
   }
 }
 
-export function addFilter(data?: Partial<Filter>) {
+export function addFilter(data?: FilterUpdate) {
   return (dispatch: AppDispatch) => {
-    dispatch({ type: ACTION.ADD_FILTER, filter: Object.assign({ type: '', enabled: true }, data) })
+    dispatch({ type: ACTION.ADD_FILTER, filter: Object.assign({ type: '', enabled: true }, data) as Filter })
     dispatch(updateQuery())
   }
 }
 
-export function updateFilter(index: number, data: Partial<Filter>) {
+export function updateFilter(index: number, data: FilterUpdate) {
   return (dispatch: AppDispatch) => {
     dispatch({ type: ACTION.UPDATE_FILTER, index, data })
     dispatch(updateQuery())
@@ -127,7 +127,7 @@ function encodeValue(v: unknown): string {
   return encodeURIComponent(String(v)).replace(/~/g, '%7E')
 }
 
-function serializeFilter(f: Partial<Filter>): string {
+function serializeFilter(f: FilterUpdate): string {
   const type = f.type ?? ''
   if (!type) return f.enabled === false ? '!' : '-'
   const typeCode = TYPE_TO_CODE[type] ?? type
@@ -196,8 +196,8 @@ function deserializeFilter(s: string): Filter {
     }
   }
 
-  const filter: Filter = { type, enabled: !disabled }
-  if (!rest.startsWith(';')) return filter
+  const filter: FilterUpdate = { type: type as Filter['type'], enabled: !disabled }
+  if (!rest.startsWith(';')) return filter as Filter
 
   const fields = rest.slice(1).split(';')
   for (const field of fields) {
@@ -247,10 +247,10 @@ function deserializeFilter(s: string): Filter {
     }
   }
 
-  return filter
+  return filter as Filter
 }
 
-export function serializeFilters(filters: Partial<Filter>[]): string | undefined {
+export function serializeFilters(filters: FilterUpdate[]): string | undefined {
   if (!filters?.length) return undefined
   return filters.map(serializeFilter).join('~')
 }
@@ -261,7 +261,7 @@ export function deserializeFilters(encoded: string): Filter[] {
 
 // ── Legacy format (kept for backward compat / fallback) ──────────────────────
 
-export function escapeJsonArray(arr: Partial<Filter>[]): string | undefined {
+export function escapeJsonArray(arr: FilterUpdate[]): string | undefined {
   if (!arr || !arr.length)
     return undefined
 

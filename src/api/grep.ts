@@ -11,7 +11,7 @@ export default class Grep extends Pipe {
   }
 
   static isValid(filter: Filter): boolean {
-    return !!filter.pattern
+    return !!(filter as Grep).pattern
   }
 
   getOutput(type: string, limit?: number): unknown {

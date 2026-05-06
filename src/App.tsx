@@ -19,7 +19,7 @@ const App: React.FC = () => {
   }, [fileName])
 
   return (
-    <div>
+    <div className="app-root">
       <Filters />
       <Result />
       <div style={{ position: 'fixed', bottom: 4, right: 8, fontSize: '0.7em', opacity: 0.4 }}>

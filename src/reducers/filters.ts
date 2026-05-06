@@ -1,9 +1,9 @@
 import * as ACTION from '../constants/actions'
-import type { Filter } from '../types'
+import type { Filter, FilterUpdate } from '../types'
 
 interface SetFiltersAction { type: typeof ACTION.SET_FILTERS; filters: Filter[] }
 interface AddFilterAction { type: typeof ACTION.ADD_FILTER; filter: Filter }
-interface UpdateFilterAction { type: typeof ACTION.UPDATE_FILTER; index: number; data: Partial<Filter> }
+interface UpdateFilterAction { type: typeof ACTION.UPDATE_FILTER; index: number; data: FilterUpdate }
 interface UpFilterAction { type: typeof ACTION.UP_FILTER; index: number }
 interface DownFilterAction { type: typeof ACTION.DOWN_FILTER; index: number }
 interface DeleteFilterAction { type: typeof ACTION.DELETE_FILTER; index: number }
@@ -29,12 +29,12 @@ export default function filters(state: Filter[] = initialState, action: FiltersA
       return action.filters
 
     case ACTION.ADD_FILTER:
-      return [...state, action.filter]
+      return [...state.slice(0, -1), action.filter, state[state.length - 1]]
 
     case ACTION.UPDATE_FILTER:
       return [
         ...state.slice(0, action.index),
-        Object.assign({}, state[action.index], action.data),
+        Object.assign({}, state[action.index], action.data) as Filter,
         ...state.slice(action.index + 1),
       ]
 

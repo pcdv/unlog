@@ -1,46 +1,62 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import InputText from '../components/InputText'
-import TextArea from '../components/TextArea'
-import Checkbox from '../components/Checkbox'
-import Select from '../components/Select'
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import InputText from "../components/InputText";
+import TextArea from "../components/TextArea";
+import Checkbox from "../components/Checkbox";
+import Select from "../components/Select";
 import {
-  addFilter, updateFilter, deleteFilter, moveFilter, loadFile,
-} from '../actions/filterActions'
-import { getChainedFilters } from '../selectors/result'
-import FileInput from '../forks/react-simple-file-input'
-import type { RootState, AppDispatch } from '../store/configureStore'
-import type { ChainedFilter } from '../types'
-import type Pipe from '../api/pipe'
+  addFilter,
+  updateFilter,
+  deleteFilter,
+  moveFilter,
+  loadFile,
+} from "../actions/filterActions";
+import { getChainedFilters } from "../selectors/result";
+import FileInput from "../forks/react-simple-file-input";
+import type { RootState, AppDispatch } from "../store/configureStore";
+import type {
+  ChainedFilter,
+  Chained,
+  CatFilter,
+  TextFilter,
+  GrepFilter as GrepFilterType,
+  ReplaceFilter as ReplaceFilterType,
+  SortFilter as SortFilterType,
+  SampleFilter as SampleFilterType,
+  ThroughputFilter as ThroughputFilterType,
+  RoundtripFilter as RoundtripFilterType,
+  ChartFilter as ChartFilterType,
+  Filter,
+} from "../types";
+import type Pipe from "../api/pipe";
 
 const Filters: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const filters = useSelector((state: RootState) => getChainedFilters(state))
-  const [folded, setFolded] = useState(false)
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
-  const [dropIndex, setDropIndex] = useState<number | null>(null)
+  const dispatch = useDispatch<AppDispatch>();
+  const filters = useSelector((state: RootState) => getChainedFilters(state));
+  const [folded, setFolded] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
 
   function handleDragStart(index: number) {
-    setDragIndex(index)
+    setDragIndex(index);
   }
 
   function handleDragOver(e: React.DragEvent, index: number) {
-    e.preventDefault()
-    if (dragIndex !== null && dragIndex !== index)
-      setDropIndex(index)
+    e.preventDefault();
+    if (dragIndex !== null && dragIndex !== index) setDropIndex(index);
   }
 
   function handleDrop(e: React.DragEvent, index: number) {
-    e.preventDefault()
+    e.preventDefault();
     if (dragIndex !== null && dragIndex !== index)
-      dispatch(moveFilter(dragIndex, index))
-    setDragIndex(null)
-    setDropIndex(null)
+      dispatch(moveFilter(dragIndex, index));
+    setDragIndex(null);
+    setDropIndex(null);
   }
 
   function handleDragEnd() {
-    setDragIndex(null)
-    setDropIndex(null)
+    setDragIndex(null);
+    setDropIndex(null);
   }
 
   return (
@@ -48,37 +64,52 @@ const Filters: React.FC = () => {
       <div className="filters-toolbar">
         <button onClick={() => dispatch(addFilter())}>Add pipe</button>
         <button
-          onClick={() => setFolded(f => !f)}
-          title={folded ? 'Expand pipeline' : 'Collapse pipeline'}
+          onClick={() => setFolded((f) => !f)}
+          title={folded ? "Expand pipeline" : "Collapse pipeline"}
         >
-          {folded ? `▶ ${filters.length} pipe${filters.length !== 1 ? 's' : ''}` : '▼ hide'}
+          {folded
+            ? `▶ ${filters.length} pipe${filters.length !== 1 ? "s" : ""}`
+            : "▼ hide"}
         </button>
       </div>
-      {!folded && filters.map(filter => getComponentForFilter(filter, dispatch, {
-        isDragging: dragIndex === filter.index,
-        isDropTarget: dropIndex === filter.index,
-        onDragStart: () => handleDragStart(filter.index),
-        onDragOver: (e) => handleDragOver(e, filter.index),
-        onDrop: (e) => handleDrop(e, filter.index),
-        onDragEnd: handleDragEnd,
-      }))}
+      {!folded &&
+        filters.map((filter) =>
+          getComponentForFilter(filter, dispatch, {
+            isDragging: dragIndex === filter.index,
+            isDropTarget: dropIndex === filter.index,
+            onDragStart: () => handleDragStart(filter.index),
+            onDragOver: (e) => handleDragOver(e, filter.index),
+            onDrop: (e) => handleDrop(e, filter.index),
+            onDragEnd: handleDragEnd,
+          }),
+        )}
     </div>
-  )
-}
+  );
+};
 
-export default Filters
+export default Filters;
 
 interface DragProps {
-  isDragging: boolean
-  isDropTarget: boolean
-  onDragStart: () => void
-  onDragOver: (e: React.DragEvent) => void
-  onDrop: (e: React.DragEvent) => void
-  onDragEnd: () => void
+  isDragging: boolean;
+  isDropTarget: boolean;
+  onDragStart: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+  onDragEnd: () => void;
 }
 
-function getComponentForFilter(filter: ChainedFilter, dispatch: AppDispatch, drag: DragProps) {
-  const classes = ['pipe-row', drag.isDragging && 'pipe-row--dragging', drag.isDropTarget && 'pipe-row--droptarget'].filter(Boolean).join(' ')
+function getComponentForFilter(
+  filter: ChainedFilter,
+  dispatch: AppDispatch,
+  drag: DragProps,
+) {
+  const classes = [
+    "pipe-row",
+    drag.isDragging && "pipe-row--dragging",
+    drag.isDropTarget && "pipe-row--droptarget",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
     <div
       key={filter.index}
@@ -92,168 +123,316 @@ function getComponentForFilter(filter: ChainedFilter, dispatch: AppDispatch, dra
         onDragStart={drag.onDragStart}
         onDragEnd={drag.onDragEnd}
         title="Drag to reorder"
-      >⠿</span>
-      <button onClick={() => dispatch(deleteFilter(filter.index))} title="Delete">✕</button>
+      >
+        ⠿
+      </span>
+      <button
+        className="delete-filter"
+        onClick={() => dispatch(deleteFilter(filter.index))}
+        title="Delete"
+      >
+        ✕
+      </button>
       <EnableFilter filter={filter} dispatch={dispatch} />
       <ChooseType filter={filter} dispatch={dispatch} />
       {getComponentForFilter0(filter, dispatch)}
     </div>
-  )
+  );
 }
 
 function getComponentForFilter0(filter: ChainedFilter, dispatch: AppDispatch) {
   switch (filter.type) {
-    case 'cat':
-      return <Cat filter={filter} dispatch={dispatch} />
-    case 'text':
-      return <Text filter={filter} dispatch={dispatch} />
-    case 'include':
-    case 'grep':
-    case 'exclude':
-      return <GrepFilter filter={filter} dispatch={dispatch} />
-    case 'replace':
-      return <ReplaceFilter filter={filter} dispatch={dispatch} />
-    case 'throughput':
-      return <ThroughputFilter filter={filter} dispatch={dispatch} />
-    case 'sample':
-      return <SampleFilter filter={filter} dispatch={dispatch} />
-    case 'roundtrip':
-      return <RoundtripFilter filter={filter} dispatch={dispatch} />
-    case 'sort':
-      return <SortFilter filter={filter} dispatch={dispatch} />
-    case 'chart':
-      return <ChartFilter filter={filter} dispatch={dispatch} />
+    case "cat":
+      return <Cat filter={filter} dispatch={dispatch} />;
+    case "text":
+      return <Text filter={filter} dispatch={dispatch} />;
+    case "include":
+    case "grep":
+    case "exclude":
+      return <GrepFilter filter={filter} dispatch={dispatch} />;
+    case "replace":
+      return <ReplaceFilter filter={filter} dispatch={dispatch} />;
+    case "throughput":
+      return <ThroughputFilter filter={filter} dispatch={dispatch} />;
+    case "sample":
+      return <SampleFilter filter={filter} dispatch={dispatch} />;
+    case "roundtrip":
+      return <RoundtripFilter filter={filter} dispatch={dispatch} />;
+    case "sort":
+      return <SortFilter filter={filter} dispatch={dispatch} />;
+    case "chart":
+      return <ChartFilter filter={filter} dispatch={dispatch} />;
     default:
-      return <span />
+      return <span />;
   }
 }
 
-interface FilterProps {
-  filter: ChainedFilter
-  dispatch: AppDispatch
+interface FilterProps<T extends Filter = Filter> {
+  filter: Chained<T>;
+  dispatch: AppDispatch;
 }
 
-const GrepFilter: React.FC<FilterProps & { placeholder?: string }> = ({ filter, dispatch, placeholder }) => (
+const GrepFilter: React.FC<
+  FilterProps<GrepFilterType> & { placeholder?: string }
+> = ({ filter, dispatch, placeholder }) => (
   <span>
-    <InputText placeholder={placeholder} size={70}
+    <InputText
+      placeholder={placeholder}
+      size={70}
       value={filter.pattern}
-      onChange={s => dispatch(updateFilter(filter.index, { pattern: s }))} />
-    <Checkbox checked={filter.ignoreCase} onChange={s => dispatch(updateFilter(filter.index, { ignoreCase: s }))}>Ignore case</Checkbox>
-    <Checkbox checked={filter.invert} onChange={s => dispatch(updateFilter(filter.index, { invert: s }))}>Invert match</Checkbox>
+      onChange={(s) => dispatch(updateFilter(filter.index, { pattern: s }))}
+    />
+    <Checkbox
+      checked={filter.ignoreCase}
+      onChange={(s) => dispatch(updateFilter(filter.index, { ignoreCase: s }))}
+    >
+      Ignore case
+    </Checkbox>
+    <Checkbox
+      checked={filter.invert}
+      onChange={(s) => dispatch(updateFilter(filter.index, { invert: s }))}
+    >
+      Invert match
+    </Checkbox>
   </span>
-)
+);
 
-const Text: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const Text: React.FC<FilterProps<TextFilter>> = ({ filter, dispatch }) => (
   <TextArea
+    className="text-filter"
+    placeholder="Paste text here"
     value={filter.text}
-    onChange={s => dispatch(updateFilter(filter.index, { text: s }))} />
-)
+    onChange={(s) => dispatch(updateFilter(filter.index, { text: s }))}
+  />
+);
 
-const Cat: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const Cat: React.FC<FilterProps<CatFilter>> = ({ filter, dispatch }) => (
   <span>
-    {filter.fileName
-      ? <button onClick={() => dispatch(updateFilter(filter.index, { fileName: undefined, _text: undefined }))}>Close file</button>
-      : <FileInput onChange={file => dispatch(loadFile(filter.index, file))}>
-        <button>Select file2...</button>
-      </FileInput>}
+    {filter.fileName ? (
+      <button
+        onClick={() =>
+          dispatch(
+            updateFilter(filter.index, {
+              fileName: undefined,
+              _text: undefined,
+            }),
+          )
+        }
+      >
+        Close file
+      </button>
+    ) : (
+      <FileInput onChange={(file) => dispatch(loadFile(filter.index, file))}>
+        <button>Select file...</button>
+      </FileInput>
+    )}
   </span>
-)
+);
 
-const ReplaceFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const ReplaceFilter: React.FC<FilterProps<ReplaceFilterType>> = ({
+  filter,
+  dispatch,
+}) => (
   <span>
-    <InputText placeholder="Regular expression"
-      value={filter.pattern} size={70}
-      onChange={s => dispatch(updateFilter(filter.index, { pattern: s }))} />
-    <InputText placeholder="Replace with"
-      value={filter.replace} size={35}
-      onChange={s => dispatch(updateFilter(filter.index, { replace: s }))} />
+    <InputText
+      placeholder="Regular expression"
+      value={filter.pattern}
+      size={70}
+      onChange={(s) => dispatch(updateFilter(filter.index, { pattern: s }))}
+    />
+    <InputText
+      placeholder="Replace with"
+      value={filter.replace}
+      size={35}
+      onChange={(s) => dispatch(updateFilter(filter.index, { replace: s }))}
+    />
   </span>
-)
+);
 
-const ChartFilter: React.FC<FilterProps> = ({ filter, dispatch }) => {
-  let fields: string[] = []
+const ChartFilter: React.FC<FilterProps<ChartFilterType>> = ({
+  filter,
+  dispatch,
+}) => {
+  let fields: string[] = [];
   try {
-    fields = (filter._previous?._processor as Pipe | undefined)?.getFields() ?? []
-  } catch (_e) { /* ignore */ }
+    fields =
+      (filter._previous?._processor as Pipe | undefined)?.getFields() ?? [];
+  } catch (_e) {
+    /* ignore */
+  }
 
   return (
     <span>
-      X: <Select value={filter.x} options={fields} onChange={x => dispatch(updateFilter(filter.index, { x }))} />
-      Y: <Select value={filter.y} options={fields} onChange={y => dispatch(updateFilter(filter.index, { y }))} />
-      <InputText placeholder="Width : 600"
-        value={filter.width} size={10}
-        onChange={width => dispatch(updateFilter(filter.index, { width }))} />
+      X:{" "}
+      <Select
+        value={filter.x}
+        options={fields}
+        onChange={(x) => dispatch(updateFilter(filter.index, { x }))}
+      />
+      Y:{" "}
+      <Select
+        value={filter.y}
+        options={fields}
+        onChange={(y) => dispatch(updateFilter(filter.index, { y }))}
+      />
+      <InputText
+        placeholder="Width : 600"
+        value={filter.width}
+        size={10}
+        onChange={(width) => dispatch(updateFilter(filter.index, { width }))}
+      />
     </span>
-  )
-}
+  );
+};
 
-const RoundtripFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const RoundtripFilter: React.FC<FilterProps<RoundtripFilterType>> = ({
+  filter,
+  dispatch,
+}) => (
   <span>
-    <InputText placeholder="Start regex with one capturing group to identify ID"
-      value={filter.start} size={70}
-      onChange={s => dispatch(updateFilter(filter.index, { start: s }))} />
-    <InputText placeholder="Stop regex"
-      value={filter.stop} size={35}
-      onChange={s => dispatch(updateFilter(filter.index, { stop: s }))} />
+    <InputText
+      placeholder="Start regex with one capturing group to identify ID"
+      value={filter.start}
+      size={70}
+      onChange={(s) => dispatch(updateFilter(filter.index, { start: s }))}
+    />
+    <InputText
+      placeholder="Stop regex"
+      value={filter.stop}
+      size={35}
+      onChange={(s) => dispatch(updateFilter(filter.index, { stop: s }))}
+    />
   </span>
-)
+);
 
-const SortFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const SortFilter: React.FC<FilterProps<SortFilterType>> = ({
+  filter,
+  dispatch,
+}) => (
   <span>
-    <Checkbox checked={filter.reverse} onChange={s => dispatch(updateFilter(filter.index, { reverse: s }))}>Reverse</Checkbox>
-    <Checkbox checked={filter.numeric} onChange={s => dispatch(updateFilter(filter.index, { numeric: s }))}>Numeric</Checkbox>
-    <Checkbox checked={filter.unique} onChange={s => dispatch(updateFilter(filter.index, { unique: s }))}>Unique</Checkbox>
+    <Checkbox
+      checked={filter.reverse}
+      onChange={(s) => dispatch(updateFilter(filter.index, { reverse: s }))}
+    >
+      Reverse
+    </Checkbox>
+    <Checkbox
+      checked={filter.numeric}
+      onChange={(s) => dispatch(updateFilter(filter.index, { numeric: s }))}
+    >
+      Numeric
+    </Checkbox>
+    <Checkbox
+      checked={filter.unique}
+      onChange={(s) => dispatch(updateFilter(filter.index, { unique: s }))}
+    >
+      Unique
+    </Checkbox>
   </span>
-)
+);
 
-const ThroughputFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const ThroughputFilter: React.FC<FilterProps<ThroughputFilterType>> = ({
+  filter,
+  dispatch,
+}) => (
   <span>
     Period (ms):
     <InputText
-      value={filter.period} size={4}
-      onChange={s => dispatch(updateFilter(filter.index, { period: Number.parseInt(s, 10) }))} />
+      value={filter.period}
+      size={4}
+      onChange={(s) =>
+        dispatch(updateFilter(filter.index, { period: Number.parseInt(s, 10) }))
+      }
+    />
     Time unit (ms):
     <InputText
       placeholder="1000"
-      value={filter.unit} size={4}
-      onChange={s => dispatch(updateFilter(filter.index, { unit: Number.parseInt(s, 10) }))} />
+      value={filter.unit}
+      size={4}
+      onChange={(s) =>
+        dispatch(updateFilter(filter.index, { unit: Number.parseInt(s, 10) }))
+      }
+    />
     <InputText
       placeholder="Regexp to extract weight"
-      value={filter.valuePattern} size={30}
-      onChange={s => dispatch(updateFilter(filter.index, { valuePattern: s }))} />
-    <Checkbox checked={filter.fillZeros} onChange={s => dispatch(updateFilter(filter.index, { fillZeros: s }))}>Fill zeros</Checkbox>
+      value={filter.valuePattern}
+      size={30}
+      onChange={(s) =>
+        dispatch(updateFilter(filter.index, { valuePattern: s }))
+      }
+    />
+    <Checkbox
+      checked={filter.fillZeros}
+      onChange={(s) => dispatch(updateFilter(filter.index, { fillZeros: s }))}
+    >
+      Fill zeros
+    </Checkbox>
   </span>
-)
+);
 
-const SampleFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const SampleFilter: React.FC<FilterProps<SampleFilterType>> = ({
+  filter,
+  dispatch,
+}) => (
   <span>
     Period (ms):
     <InputText
-      value={filter.period} size={4}
-      onChange={s => dispatch(updateFilter(filter.index, { period: Number.parseInt(s, 10) }))} />
+      value={filter.period}
+      size={4}
+      onChange={(s) =>
+        dispatch(updateFilter(filter.index, { period: Number.parseInt(s, 10) }))
+      }
+    />
     Time unit (ms):
     <InputText
       placeholder="1000"
-      value={filter.unit} size={4}
-      onChange={s => dispatch(updateFilter(filter.index, { unit: Number.parseInt(s, 10) }))} />
+      value={filter.unit}
+      size={4}
+      onChange={(s) =>
+        dispatch(updateFilter(filter.index, { unit: Number.parseInt(s, 10) }))
+      }
+    />
     <InputText
       placeholder="min, max, throughput, sum"
-      value={filter.functions} size={20}
-      onChange={functions => dispatch(updateFilter(filter.index, { functions }))} />
+      value={filter.functions}
+      size={20}
+      onChange={(functions) =>
+        dispatch(updateFilter(filter.index, { functions }))
+      }
+    />
     <InputText
       placeholder="Regexp to extract weight"
-      value={filter.valuePattern} size={30}
-      onChange={s => dispatch(updateFilter(filter.index, { valuePattern: s }))} />
-    <Checkbox checked={filter.fillZeros} onChange={s => dispatch(updateFilter(filter.index, { fillZeros: s }))}>Fill zeros</Checkbox>
+      value={filter.valuePattern}
+      size={30}
+      onChange={(s) =>
+        dispatch(updateFilter(filter.index, { valuePattern: s }))
+      }
+    />
+    <Checkbox
+      checked={filter.fillZeros}
+      onChange={(s) => dispatch(updateFilter(filter.index, { fillZeros: s }))}
+    >
+      Fill zeros
+    </Checkbox>
   </span>
-)
+);
 
 const EnableFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
-  <Checkbox checked={filter.enabled} onChange={enabled => dispatch(updateFilter(filter.index, { enabled }))} />
-)
+  <Checkbox
+    checked={filter.enabled}
+    onChange={(enabled) => dispatch(updateFilter(filter.index, { enabled }))}
+  />
+);
 
 const ChooseType: React.FC<FilterProps> = ({ filter, dispatch }) => (
-  <select value={filter.type || 'invalid'} onChange={e => dispatch(updateFilter(filter.index, { type: e.target.value }))}>
+  <select
+    value={filter.type || "invalid"}
+    onChange={(e) =>
+      dispatch(
+        updateFilter(filter.index, { type: e.target.value as Filter["type"] }),
+      )
+    }
+  >
     <option value=""></option>
     <option value="cat">cat</option>
     <option value="text">text</option>
@@ -266,4 +445,4 @@ const ChooseType: React.FC<FilterProps> = ({ filter, dispatch }) => (
     <option value="show">show</option>
     <option value="chart">chart</option>
   </select>
-)
+);

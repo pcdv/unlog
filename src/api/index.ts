@@ -20,12 +20,10 @@ export function getProcessor(filter: Filter): PipeConstructor & { isValid: (f: F
     case 'grep':
       return Grep
     case 'exclude':
-      filter.invert = true
       return Grep
     case 'replace':
       return Replace
     case 'throughput':
-      filter.functions = 'throughput'
       return Sample
     case 'sample':
       return Sample
@@ -41,7 +39,6 @@ export function getProcessor(filter: Filter): PipeConstructor & { isValid: (f: F
     case 'chart':
       return Chart
     default:
-      if (filter.type) console.warn('Unknown filter: ' + filter.type)
       return Dummy
   }
 }

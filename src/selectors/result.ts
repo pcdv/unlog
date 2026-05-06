@@ -11,7 +11,7 @@ const filterSelector = (state: RootState) => state.filters
 
 const getValidFilters = createSelector(
   filterSelector,
-  (filters: Filter[]) => filters.filter(f => f.enabled && getProcessor(f).isValid(f))
+  (filters: Filter[]) => filters.filter(f => f?.enabled && getProcessor(f).isValid(f))
 )
 
 export const getChainedFilters = createSelector(

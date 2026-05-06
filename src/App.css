@@ -5,7 +5,7 @@
   z-index: 100;
   background: #f0f2f5;
   border-bottom: 1px solid #c8ccd2;
-  padding: 4px 8px;
+  padding: 4px 4px;
   font-size: 12px;
 }
 
@@ -36,10 +36,10 @@
 }
 
 .drag-handle {
-  cursor: grab;
-  padding: 0 2px;
+  /* cursor: grab; */
+  padding: 0 0px;
   color: #aaa;
-  font-size: 14px;
+  font-size: 13px;
   user-select: none;
 }
 
@@ -49,6 +49,28 @@
 
 .drag-handle:active {
   cursor: grabbing;
+}
+
+button.delete-filter {
+  padding: 0 2px;
+  font-size: 12px;
+  border: none;
+  background: transparent;
+  color: #b00;
+  cursor: pointer;
+  line-height: 1;
+}
+
+textarea.text-filter {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 11px;
+  padding: 4px 6px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  background: #fff;
+  color: #222;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Buttons ─────────────────────────────────────────── */
@@ -112,8 +134,18 @@ label {
   white-space: nowrap;
 }
 
+/* ── App root ───────────────────────────────────────── */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
 /* ── Result area ─────────────────────────────────────── */
 .result-area {
+  flex: 1;
+  overflow-y: auto;
   padding: 4px 8px;
 }
 

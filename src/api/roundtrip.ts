@@ -37,7 +37,8 @@ export default class Roundtrip extends Pipe {
   }
 
   static isValid(filter: Filter): boolean {
-    return !!(filter.start && filter.stop)
+    const rt = filter as Roundtrip
+    return !!(rt.start && rt.stop)
   }
 
   getFields(): string[] {

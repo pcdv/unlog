@@ -55,12 +55,13 @@ export default class Sample extends Pipe {
   declare unit?: number
   declare valuePattern?: string
   declare fillZeros?: boolean
-  declare functions: string
+  declare functions?: string
   private _functions!: SampleFunction[]
 
   constructor(filter: Filter, previous?: Pipe) {
     super(filter, previous)
-    this._functions = (this.functions || '').split(/[\s,]+/).map(name => FUNCTIONS[name]).filter(Boolean)
+    const funcNames = this.type === 'throughput' ? 'throughput' : (this.functions || '')
+    this._functions = funcNames.split(/[\s,]+/).map(name => FUNCTIONS[name]).filter(Boolean)
   }
 
   getFields(): string[] {
