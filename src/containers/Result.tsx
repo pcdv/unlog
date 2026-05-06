@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { useSelector } from 'react-redux'
 import download from '../util/download'
 import { getResult } from '../selectors/result'
 import enumerate from '../util/enumerate'
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts'
 import type { RootState } from '../store/configureStore'
 import type { Visualisation } from '../api/context'
+
+const Chart = lazy(() => import('./Chart'))
 
 const Result: React.FC = () => {
   const result = useSelector((state: RootState) => getResult(state))
@@ -25,7 +26,7 @@ function getViz(viz: Visualisation & { index: number; isLast?: boolean }) {
     case 'show':
       return <Show viz={viz as ShowViz} key={viz.index} />
     case 'chart':
-      return <Chart viz={viz as ChartViz} key={viz.index} />
+      return <Suspense key={viz.index} fallback={null}><Chart viz={viz as ChartViz} /></Suspense>
     default:
       return <pre key={viz.index}>Unknown viz {viz.type}</pre>
   }
@@ -54,12 +55,3 @@ interface ChartViz extends Visualisation {
   filter: { width?: string; x?: string; y?: string }
   index: number
 }
-
-const Chart: React.FC<{ viz: ChartViz }> = ({ viz }) => (
-  <LineChart width={parseInt(viz.filter.width ?? '600', 10)} height={300} data={viz.data}>
-    <Line type="monotone" dataKey={viz.filter.y} stroke="#8884d8" dot={false} />
-    <CartesianGrid stroke="#ccc" />
-    <XAxis dataKey={viz.filter.x} minTickGap={20} />
-    <YAxis />
-  </LineChart>
-)

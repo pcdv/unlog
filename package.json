@@ -1,6 +1,6 @@
 {
   "name": "unlog",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "homepage": "http://pcdv.github.io/unlog",
   "type": "module",
@@ -16,11 +16,13 @@
     "reselect": "^5"
   },
   "devDependencies": {
-    "gh-pages": "^6",
     "@types/lodash": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6",
+    "gh-pages": "^6",
+    "rollup": "^4.60.3",
+    "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "^6",
     "vite": "^8"
   },
