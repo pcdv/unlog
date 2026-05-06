@@ -3,8 +3,8 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #f0f2f5;
-  border-bottom: 1px solid #c8ccd2;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-panel);
   padding: 4px 4px;
   font-size: 12px;
 }
@@ -38,13 +38,13 @@
 .drag-handle {
   /* cursor: grab; */
   padding: 0 0px;
-  color: #aaa;
+  color: var(--drag-handle);
   font-size: 13px;
   user-select: none;
 }
 
 .drag-handle:hover {
-  color: #555;
+  color: var(--drag-handle-hover);
 }
 
 .drag-handle:active {
@@ -56,7 +56,7 @@ button.delete-filter {
   font-size: 12px;
   border: none;
   background: transparent;
-  color: #b00;
+  color: var(--warn);
   cursor: pointer;
   line-height: 1;
 }
@@ -65,10 +65,10 @@ textarea.text-filter {
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 11px;
   padding: 4px 6px;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border-input);
   border-radius: 3px;
-  background: #fff;
-  color: #222;
+  background: var(--bg-input);
+  color: var(--text-input);
   width: 100%;
   box-sizing: border-box;
 }
@@ -77,9 +77,9 @@ textarea.text-filter {
 button {
   padding: 1px 7px;
   font-size: 11px;
-  border: 1px solid #bbb;
-  background: #fff;
-  color: #333;
+  border: 1px solid var(--border-input);
+  background: var(--bg-button);
+  color: var(--text-button);
   cursor: pointer;
   border-radius: 3px;
   line-height: 1.6;
@@ -87,8 +87,8 @@ button {
 }
 
 button:hover {
-  background: #e8eaf0;
-  border-color: #999;
+  background: var(--bg-button-hover);
+  border-color: var(--border-button-hover);
 }
 
 button:disabled {
@@ -101,12 +101,12 @@ input[type='text'],
 input:not([type]) {
   font-size: 12px;
   padding: 1px 5px;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border-input);
   border-radius: 3px;
   height: 20px;
   box-sizing: border-box;
-  background: #fff;
-  color: #222;
+  background: var(--bg-input);
+  color: var(--text-input);
 }
 
 input[type='text']:focus,
@@ -119,10 +119,10 @@ input:not([type]):focus {
 select {
   font-size: 12px;
   padding: 1px 3px;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border-input);
   border-radius: 3px;
-  background: #fff;
-  color: #222;
+  background: var(--bg-input);
+  color: var(--text-input);
   height: 22px;
 }
 
@@ -157,7 +157,7 @@ label {
 }
 
 .result-warn {
-  color: #b00;
+  color: var(--warn);
   font-size: 12px;
 }
 

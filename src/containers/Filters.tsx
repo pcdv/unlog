@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useDarkMode } from "../hooks/useDarkMode";
 import InputText from "../components/InputText";
 import TextArea from "../components/TextArea";
 import Checkbox from "../components/Checkbox";
@@ -36,6 +37,7 @@ const Filters: React.FC = () => {
   const [folded, setFolded] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
+  const { isDark, toggleDarkMode } = useDarkMode();
 
   function handleDragStart(index: number) {
     setDragIndex(index);
@@ -70,6 +72,13 @@ const Filters: React.FC = () => {
           {folded
             ? `▶ ${filters.length} pipe${filters.length !== 1 ? "s" : ""}`
             : "▼ hide"}
+        </button>
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={toggleDarkMode}
+          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        >
+          {isDark ? "☀️ Light" : "🌙 Dark"}
         </button>
       </div>
       {!folded &&

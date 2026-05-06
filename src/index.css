@@ -1,8 +1,42 @@
+:root {
+  --bg-main: #fff;
+  --text-main: #222;
+  --bg-panel: #f0f2f5;
+  --border-panel: #c8ccd2;
+  --border-input: #bbb;
+  --bg-input: #fff;
+  --text-input: #222;
+  --bg-button: #fff;
+  --text-button: #333;
+  --bg-button-hover: #e8eaf0;
+  --border-button-hover: #999;
+  --drag-handle: #aaa;
+  --drag-handle-hover: #555;
+  --warn: #b00;
+}
+
+.dark {
+  --bg-main: #141414;
+  --text-main: #d4d4d4;
+  --bg-panel: #202020;
+  --border-panel: #3f3f46;
+  --border-input: #555;
+  --bg-input: #2d2d2d;
+  --text-input: #e4e4e4;
+  --bg-button: #2d2d2d;
+  --text-button: #d4d4d4;
+  --bg-button-hover: #404040;
+  --border-button-hover: #777;
+  --drag-handle: #666;
+  --drag-handle-hover: #aaa;
+  --warn: #ff6b6b;
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 13px;
-  background: #fff;
-  color: #222;
+  background: var(--bg-main);
+  color: var(--text-main);
 }
