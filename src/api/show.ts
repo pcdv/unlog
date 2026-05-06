@@ -10,8 +10,10 @@ export default class Show extends Pipe {
   exec(context: Context): void {
     const settings = context.settings
 
-    const lines = this.getPrevious().getOutput('lines') as string[]
-    const linesDropped = lines.length <= settings.maxLines ? 0 : lines.length - settings.maxLines
+    // Request one extra line so we can detect (and report) truncation even when
+    // an upstream pipe (e.g. Grep) stopped early once it reached the limit.
+    const lines = this.getPrevious().getOutput('lines', settings.maxLines + 1) as string[]
+    const linesDropped = lines.length > settings.maxLines ? lines.length - settings.maxLines : 0
     const res = lines.slice(0, settings.maxLines).join('\n')
 
     const txt = res.length < settings.maxChars ? res : res.substring(0, settings.maxChars)

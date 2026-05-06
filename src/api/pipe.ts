@@ -21,12 +21,12 @@ export default class Pipe {
     return this.previous
   }
 
-  getInput(type: string): unknown {
-    return this.getPrevious().getOutput(type)
+  getInput(type: string, limit?: number): unknown {
+    return this.getPrevious().getOutput(type, limit)
   }
 
-  getOutput(type: string): unknown {
-    return this.compute(this.getInput(type) as string[])
+  getOutput(type: string, limit?: number): unknown {
+    return this.compute(this.getInput(type, limit) as string[])
   }
 
   getFields(): string[] {

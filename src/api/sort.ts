@@ -10,6 +10,11 @@ export default class Sort extends Pipe {
     super(filter, previous)
   }
 
+  getOutput(type: string, _limit?: number): unknown {
+    // Sort must see all input lines to produce correct results; ignore downstream limit.
+    return this.compute(this.getInput(type) as string[])
+  }
+
   compute(lines: string[]): string[] {
     let sortFunc: (a: string, b: string) => number
 
