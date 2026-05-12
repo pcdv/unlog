@@ -11,6 +11,9 @@ import {
   deleteFilter,
   moveFilter,
   loadFile,
+  removeColorRule,
+  addColorRule,
+  updateColorRule,
 } from "../actions/filterActions";
 import { getChainedFilters } from "../selectors/result";
 import FileInput from "../forks/react-simple-file-input";
@@ -30,6 +33,114 @@ import type {
   Filter,
 } from "../types";
 import type Pipe from "../api/pipe";
+
+const HIGHLIGHT_COLORS = [
+  { name: "red", label: "Red" },
+  { name: "green", label: "Green" },
+  { name: "blue", label: "Blue" },
+];
+
+const NAMED_COLORS = new Set(["red", "green", "blue"]);
+
+function isNamed(color: string): boolean {
+  return NAMED_COLORS.has(color);
+}
+
+/** Chip background style for custom hex colors (named colors use CSS class). */
+function customChipStyle(color: string): React.CSSProperties | undefined {
+  return isNamed(color) ? undefined : { background: color + "66" };
+}
+
+const ColorRulesPanel: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const colorRules = useSelector((state: RootState) => state.colorRules);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editPattern, setEditPattern] = useState("");
+
+  if (!colorRules.length) return null;
+
+  function startEdit(i: number) {
+    setEditIndex(i);
+    setEditPattern(colorRules[i].pattern);
+  }
+
+  function commitEdit(i: number) {
+    if (editPattern.trim()) {
+      const color = colorRules[i].color;
+      dispatch(removeColorRule(i));
+      // re-insert at same position by removing then adding (simple approach)
+      dispatch(addColorRule(editPattern.trim(), color));
+    }
+    setEditIndex(null);
+  }
+
+  return (
+    <div className="color-rules-panel">
+      <span className="color-rules-panel-label">Highlights:</span>
+      {colorRules.map((rule, i) => (
+        <span
+          key={i}
+          className={`color-rule${isNamed(rule.color) ? ` hl-${rule.color}` : ""}`}
+          style={customChipStyle(rule.color)}
+        >
+          {editIndex === i ? (
+            <input
+              className="color-rule-edit-input"
+              value={editPattern}
+              autoFocus
+              onChange={(e) => setEditPattern(e.target.value)}
+              onBlur={() => commitEdit(i)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitEdit(i);
+                if (e.key === "Escape") setEditIndex(null);
+              }}
+            />
+          ) : (
+            <span
+              className="color-rule-pattern"
+              title="Click to edit pattern"
+              onClick={() => startEdit(i)}
+            >
+              {rule.pattern}
+            </span>
+          )}
+          <span className="color-rule-color-swatches">
+            {HIGHLIGHT_COLORS.map((c) => (
+              <button
+                key={c.name}
+                className={`color-swatch color-swatch--${c.name}${
+                  rule.color === c.name ? " color-swatch--active" : ""
+                }`}
+                title={c.label}
+                onClick={() => {
+                  dispatch(updateColorRule(i, { color: c.name }));
+                }}
+              />
+            ))}
+            <input
+              type="color"
+              className={`color-swatch color-swatch--custom${
+                !isNamed(rule.color) ? " color-swatch--active" : ""
+              }`}
+              value={isNamed(rule.color) ? "#ff8800" : rule.color}
+              title="Custom color…"
+              onChange={(e) =>
+                dispatch(updateColorRule(i, { color: e.target.value }))
+              }
+            />
+          </span>
+          <button
+            className="color-rule-remove"
+            onClick={() => dispatch(removeColorRule(i))}
+            title="Remove highlight"
+          >
+            ×
+          </button>
+        </span>
+      ))}
+    </div>
+  );
+};
 
 const Filters: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -81,6 +192,7 @@ const Filters: React.FC = () => {
           {isDark ? "☀️ Light" : "🌙 Dark"}
         </button>
       </div>
+      <ColorRulesPanel />
       {!folded &&
         filters.map((filter) =>
           getComponentForFilter(filter, dispatch, {

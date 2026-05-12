@@ -194,3 +194,123 @@ pre {
   text-overflow: ellipsis;
   opacity: 0.8;
 }
+
+.selection-popup-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border-panel);
+  flex-shrink: 0;
+}
+
+/* ── Color swatch buttons (in selection popup) ────────── */
+.color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.color-swatch--red   { background: #e74c3c; }
+.color-swatch--green { background: #2ecc71; }
+.color-swatch--blue  { background: #3498db; }
+
+/* input[type="color"] styled as a circular swatch */
+.color-swatch--custom {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+  overflow: hidden;
+}
+.color-swatch--custom::-webkit-color-swatch-wrapper { padding: 0; }
+.color-swatch--custom::-webkit-color-swatch { border: none; border-radius: 50%; }
+.color-swatch--custom::-moz-color-swatch { border: none; }
+
+.color-swatch--active {
+  outline: 2px solid var(--text-main);
+  outline-offset: 1px;
+}
+
+/* ── Highlight marks in the pre output ───────────────── */
+mark.hl-red   { background: rgba(231, 76,  60,  0.35); color: inherit; padding: 0; }
+mark.hl-green { background: rgba(46,  204, 113, 0.35); color: inherit; padding: 0; }
+mark.hl-blue  { background: rgba(52,  152, 219, 0.35); color: inherit; padding: 0; }
+
+/* ── Active color rules bar ──────────────────────────── */
+.color-rules-panel {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 11px;
+  border-top: 1px solid var(--border-panel);
+}
+
+.color-rules-panel-label {
+  opacity: 0.6;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.color-rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 4px 1px 6px;
+  border-radius: 3px;
+}
+
+.color-rule-pattern {
+  font-family: 'Consolas', 'Courier New', monospace;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.color-rule-pattern:hover {
+  text-decoration: underline;
+}
+
+.color-rule-edit-input {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 11px;
+  width: 120px;
+  border: 1px solid var(--border-panel);
+  border-radius: 2px;
+  background: var(--bg-panel);
+  color: var(--text-main);
+  padding: 0 2px;
+}
+
+.color-rule-color-swatches {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 2px;
+}
+
+.color-rule-remove {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 2px;
+  color: inherit;
+  opacity: 0.6;
+}
+
+.color-rule-remove:hover {
+  opacity: 1;
+}
+
+/* keep old .color-rules for backward compat (Show component, no longer used) */
+.color-rules {
+  display: none;
+}

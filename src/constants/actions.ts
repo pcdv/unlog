@@ -9,3 +9,8 @@ export const DELETE_FILTER = 'DELETE_FILTER'
 export const UP_FILTER = 'UP_FILTER'
 export const DOWN_FILTER = 'DOWN_FILTER'
 export const MOVE_FILTER = 'MOVE_FILTER'
+
+export const ADD_COLOR_RULE = 'ADD_COLOR_RULE'
+export const REMOVE_COLOR_RULE = 'REMOVE_COLOR_RULE'
+export const SET_COLOR_RULES = 'SET_COLOR_RULES'
+export const UPDATE_COLOR_RULE = 'UPDATE_COLOR_RULE'

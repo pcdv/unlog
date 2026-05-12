@@ -135,6 +135,11 @@ export type FilterUpdate = {
   _processor?: Pipe
 }
 
+export interface ColorRule {
+  pattern: string
+  color: string
+}
+
 export interface FileSelectionState {
   name?: string
   text?: string

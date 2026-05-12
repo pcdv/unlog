@@ -1,6 +1,6 @@
 import * as ACTION from '../constants/actions'
 import type { AppDispatch, RootState } from '../store/configureStore'
-import type { Filter, FilterUpdate } from '../types'
+import type { ColorRule, Filter, FilterUpdate } from '../types'
 
 function removePrivateFields(obj: Filter): FilterUpdate {
   const res: Record<string, unknown> = {}
@@ -13,11 +13,15 @@ function removePrivateFields(obj: Filter): FilterUpdate {
 
 export function updateQuery() {
   return (_dispatch: AppDispatch, getState: () => RootState) => {
-    const { filters } = getState()
-    const encoded = serializeFilters(filters.map(removePrivateFields))
+    const { filters, colorRules } = getState()
+    const encodedFilters = serializeFilters(filters.map(removePrivateFields))
+    const encodedColors = serializeColorRules(colorRules)
+    const parts: string[] = []
+    if (encodedFilters) parts.push(`f=${encodedFilters}`)
+    if (encodedColors) parts.push(`c=${encodedColors}`)
     // Set URL directly (no URLSearchParams) to avoid double percent-encoding
-    const newUrl = encoded
-      ? `${window.location.pathname}?f=${encoded}`
+    const newUrl = parts.length
+      ? `${window.location.pathname}?${parts.join('&')}`
       : window.location.pathname
     window.history.replaceState(null, '', newUrl)
   }
@@ -40,13 +44,40 @@ export function initFilters() {
     const newFmtMatch = window.location.search.match(/(?:^[?&]|&)f=([^&]*)/)
     if (newFmtMatch?.[1]) {
       dispatch(setFilters(deserializeFilters(newFmtMatch[1]), false))
-      return
+    } else {
+      // Fall back to legacy JSON format: ?filters=...
+      const params = new URLSearchParams(window.location.search)
+      const filtersParam = params.get('filters')
+      if (filtersParam)
+        dispatch(setFilters(toJsonArray(filtersParam), false))
     }
-    // Fall back to legacy JSON format: ?filters=...
-    const params = new URLSearchParams(window.location.search)
-    const filtersParam = params.get('filters')
-    if (filtersParam)
-      dispatch(setFilters(toJsonArray(filtersParam), false))
+    // Parse color rules
+    const colorMatch = window.location.search.match(/(?:^[?&]|&)c=([^&]*)/)
+    if (colorMatch?.[1]) {
+      const rules = deserializeColorRules(colorMatch[1])
+      dispatch({ type: ACTION.SET_COLOR_RULES, rules })
+    }
+  }
+}
+
+export function addColorRule(pattern: string, color: string) {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: ACTION.ADD_COLOR_RULE, rule: { pattern, color } as ColorRule })
+    dispatch(updateQuery())
+  }
+}
+
+export function updateColorRule(index: number, patch: { color?: string; pattern?: string }) {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: ACTION.UPDATE_COLOR_RULE, index, ...patch })
+    dispatch(updateQuery())
+  }
+}
+
+export function removeColorRule(index: number) {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: ACTION.REMOVE_COLOR_RULE, index })
+    dispatch(updateQuery())
   }
 }
 
@@ -274,4 +305,26 @@ export function toJsonArray(obj: string): Filter[] {
 
 function escplus(s: string): string {
   return encodeURIComponent(s).replace(/\+/g, '%2B')
+}
+
+// ── Color rules URL format ───────────────────────────────────────────────────
+// Encoded as: <color1>:<encodedPattern1>~<color2>:<encodedPattern2>
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function serializeColorRules(rules: ColorRule[]): string | undefined {
+  if (!rules.length) return undefined
+  return rules.map(r => `${r.color}:${encodeValue(r.pattern)}`).join('~')
+}
+
+export function deserializeColorRules(encoded: string): ColorRule[] {
+  return encoded
+    .split('~')
+    .map(s => {
+      const colonIdx = s.indexOf(':')
+      if (colonIdx < 0) return null
+      const color = s.slice(0, colonIdx)
+      const pattern = decodeURIComponent(s.slice(colonIdx + 1))
+      return { color, pattern }
+    })
+    .filter((r): r is ColorRule => r !== null)
 }
