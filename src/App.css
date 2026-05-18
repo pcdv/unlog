@@ -234,9 +234,9 @@ pre {
 }
 
 /* ── Highlight marks in the pre output ───────────────── */
-mark.hl-red   { background: rgba(231, 76,  60,  0.35); color: inherit; padding: 0; }
-mark.hl-green { background: rgba(46,  204, 113, 0.35); color: inherit; padding: 0; }
-mark.hl-blue  { background: rgba(52,  152, 219, 0.35); color: inherit; padding: 0; }
+mark.hl-red   { background: transparent; color: #e74c3c; padding: 0; font-weight: bold; }
+mark.hl-green { background: transparent; color: #27ae60; padding: 0; font-weight: bold; }
+mark.hl-blue  { background: transparent; color: #2980b9; padding: 0; font-weight: bold; }
 
 /* ── Active color rules bar ──────────────────────────── */
 .color-rules-panel {
@@ -261,8 +261,9 @@ mark.hl-blue  { background: rgba(52,  152, 219, 0.35); color: inherit; padding: 
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  padding: 1px 4px 1px 6px;
+  padding: 1px 4px 1px 4px;
   border-radius: 3px;
+  border: 1px solid currentColor;
 }
 
 .color-rule-pattern {
@@ -289,11 +290,22 @@ mark.hl-blue  { background: rgba(52,  152, 219, 0.35); color: inherit; padding: 
   padding: 0 2px;
 }
 
-.color-rule-color-swatches {
-  display: inline-flex;
-  gap: 2px;
-  margin-left: 2px;
+/* Single color-picker swatch on each rule chip */
+.color-rule-swatch {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  overflow: hidden;
 }
+.color-rule-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+.color-rule-swatch::-webkit-color-swatch { border: none; border-radius: 50%; }
+.color-rule-swatch::-moz-color-swatch { border: none; }
 
 .color-rule-remove {
   background: transparent;

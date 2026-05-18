@@ -66,11 +66,17 @@ function applyColorRules(text: string, rules: ColorRule[]): React.ReactNode {
   for (const { start, end, color } of intervals) {
     if (pos < start) nodes.push(text.slice(pos, start));
     const named = ["red", "green", "blue"].includes(color);
+    const namedHex: Record<string, string> = {
+      red: "#e74c3c",
+      green: "#27ae60",
+      blue: "#2980b9",
+    };
+    const resolvedColor = namedHex[color] ?? color;
     nodes.push(
       <mark
         key={start}
         className={named ? `hl-${color}` : undefined}
-        style={named ? undefined : { background: color + "66", padding: 0 }}
+        style={named ? undefined : { background: "transparent", color: resolvedColor, fontWeight: "bold", padding: 0 }}
       >
         {text.slice(start, end)}
       </mark>,
@@ -86,6 +92,7 @@ export const Show: React.FC<{ viz: ShowViz }> = ({ viz }) => {
   const colorRules = useSelector((state: RootState) => state.colorRules);
   const preRef = useRef<HTMLPreElement>(null);
   const [popup, setPopup] = useState<PopupState | null>(null);
+  const isDblClick = useRef(false);
 
   function handleMouseUp() {
     const sel = window.getSelection();
@@ -93,7 +100,18 @@ export const Show: React.FC<{ viz: ShowViz }> = ({ viz }) => {
       setPopup(null);
       return;
     }
-    const text = sel.toString();
+
+    // Only trim trailing whitespace when the selection came from a double-click
+    // (browsers auto-extend double-click word selections to include the next space).
+    const selModify = (sel as typeof sel & { modify?: (...args: string[]) => void }).modify;
+    if (isDblClick.current && selModify) {
+      while (/\s$/.test(sel.toString())) {
+        selModify.call(sel, "extend", "backward", "character");
+      }
+    }
+    isDblClick.current = false;
+
+    const text = sel.toString().trim(); // trim as fallback when modify unavailable
     if (!text || text.includes("\n")) {
       setPopup(null);
       return;
@@ -151,7 +169,7 @@ export const Show: React.FC<{ viz: ShowViz }> = ({ viz }) => {
         ) : null}
       </div>
 
-      <pre ref={preRef} onMouseUp={handleMouseUp}>
+      <pre ref={preRef} onMouseUp={handleMouseUp} onDoubleClick={() => { isDblClick.current = true; }}>
         {renderedText}
       </pre>
       {popup && (

@@ -12,7 +12,6 @@ import {
   moveFilter,
   loadFile,
   removeColorRule,
-  addColorRule,
   updateColorRule,
 } from "../actions/filterActions";
 import { getChainedFilters } from "../selectors/result";
@@ -34,21 +33,21 @@ import type {
 } from "../types";
 import type Pipe from "../api/pipe";
 
-const HIGHLIGHT_COLORS = [
-  { name: "red", label: "Red" },
-  { name: "green", label: "Green" },
-  { name: "blue", label: "Blue" },
-];
+const NAMED_COLOR_HEX: Record<string, string> = {
+  red: "#e74c3c",
+  green: "#27ae60",
+  blue: "#2980b9",
+};
 
-const NAMED_COLORS = new Set(["red", "green", "blue"]);
+const NAMED_COLORS = new Set(Object.keys(NAMED_COLOR_HEX));
 
 function isNamed(color: string): boolean {
   return NAMED_COLORS.has(color);
 }
 
-/** Chip background style for custom hex colors (named colors use CSS class). */
-function customChipStyle(color: string): React.CSSProperties | undefined {
-  return isNamed(color) ? undefined : { background: color + "66" };
+/** Resolve any color (named or hex) to a CSS hex string. */
+function resolveColor(color: string): string {
+  return NAMED_COLOR_HEX[color] ?? color;
 }
 
 const ColorRulesPanel: React.FC = () => {
@@ -66,10 +65,7 @@ const ColorRulesPanel: React.FC = () => {
 
   function commitEdit(i: number) {
     if (editPattern.trim()) {
-      const color = colorRules[i].color;
-      dispatch(removeColorRule(i));
-      // re-insert at same position by removing then adding (simple approach)
-      dispatch(addColorRule(editPattern.trim(), color));
+      dispatch(updateColorRule(i, { pattern: editPattern.trim() }));
     }
     setEditIndex(null);
   }
@@ -80,8 +76,8 @@ const ColorRulesPanel: React.FC = () => {
       {colorRules.map((rule, i) => (
         <span
           key={i}
-          className={`color-rule${isNamed(rule.color) ? ` hl-${rule.color}` : ""}`}
-          style={customChipStyle(rule.color)}
+          className="color-rule"
+          style={{ color: resolveColor(rule.color) }}
         >
           {editIndex === i ? (
             <input
@@ -104,31 +100,15 @@ const ColorRulesPanel: React.FC = () => {
               {rule.pattern}
             </span>
           )}
-          <span className="color-rule-color-swatches">
-            {HIGHLIGHT_COLORS.map((c) => (
-              <button
-                key={c.name}
-                className={`color-swatch color-swatch--${c.name}${
-                  rule.color === c.name ? " color-swatch--active" : ""
-                }`}
-                title={c.label}
-                onClick={() => {
-                  dispatch(updateColorRule(i, { color: c.name }));
-                }}
-              />
-            ))}
-            <input
-              type="color"
-              className={`color-swatch color-swatch--custom${
-                !isNamed(rule.color) ? " color-swatch--active" : ""
-              }`}
-              value={isNamed(rule.color) ? "#ff8800" : rule.color}
-              title="Custom color…"
-              onChange={(e) =>
-                dispatch(updateColorRule(i, { color: e.target.value }))
-              }
-            />
-          </span>
+          <input
+            type="color"
+            className="color-rule-swatch"
+            value={resolveColor(rule.color)}
+            title="Change color"
+            onChange={(e) =>
+              dispatch(updateColorRule(i, { color: e.target.value }))
+            }
+          />
           <button
             className="color-rule-remove"
             onClick={() => dispatch(removeColorRule(i))}
