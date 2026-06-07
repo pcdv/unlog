@@ -22,6 +22,7 @@ import type {
   Chained,
   CatFilter,
   TextFilter,
+  ClipboardFilter as ClipboardFilterType,
   GrepFilter as GrepFilterType,
   ReplaceFilter as ReplaceFilterType,
   SortFilter as SortFilterType,
@@ -251,6 +252,8 @@ function getComponentForFilter0(filter: ChainedFilter, dispatch: AppDispatch) {
       return <Cat filter={filter} dispatch={dispatch} />;
     case "text":
       return <Text filter={filter} dispatch={dispatch} />;
+    case "clipboard":
+      return <ClipboardFilter filter={filter} dispatch={dispatch} />;
     case "include":
     case "grep":
     case "exclude":
@@ -309,6 +312,27 @@ const Text: React.FC<FilterProps<TextFilter>> = ({ filter, dispatch }) => (
     value={filter.text}
     onChange={(s) => dispatch(updateFilter(filter.index, { text: s }))}
   />
+);
+
+const ClipboardFilter: React.FC<FilterProps<ClipboardFilterType>> = ({
+  filter,
+  dispatch,
+}) => (
+  <span>
+    <button
+      onClick={async () => {
+        const text = await navigator.clipboard.readText();
+        dispatch(updateFilter(filter.index, { text }));
+      }}
+    >
+      Import from clipboard
+    </button>
+    {filter.text && (
+      <span style={{ marginLeft: 8, opacity: 0.6 }}>
+        ({filter.text.length} chars)
+      </span>
+    )}
+  </span>
 );
 
 const Cat: React.FC<FilterProps<CatFilter>> = ({ filter, dispatch }) => (
@@ -538,6 +562,7 @@ const ChooseInputType: React.FC<FilterProps> = ({ filter, dispatch }) => (
   >
     <option value="cat">cat</option>
     <option value="text">text</option>
+    <option value="clipboard">clipboard</option>
   </select>
 );
 

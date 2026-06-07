@@ -18,6 +18,11 @@ export interface TextFilter extends FilterBase {
   text?: string
 }
 
+export interface ClipboardFilter extends FilterBase {
+  type: 'clipboard'
+  text?: string
+}
+
 export interface GrepFilter extends FilterBase {
   type: 'grep' | 'include' | 'exclude'
   pattern?: string
@@ -80,6 +85,7 @@ export interface EmptyFilter extends FilterBase {
 export type Filter =
   | CatFilter
   | TextFilter
+  | ClipboardFilter
   | GrepFilter
   | ReplaceFilter
   | SortFilter

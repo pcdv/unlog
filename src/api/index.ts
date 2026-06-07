@@ -33,6 +33,7 @@ export function getProcessor(filter: Filter): PipeConstructor & { isValid: (f: F
       return Sort
     case 'cat':
     case 'text':
+    case 'clipboard':
       return Text
     case 'show':
       return Show
