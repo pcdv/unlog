@@ -35,6 +35,26 @@
   border-radius: 3px;
 }
 
+/* Input / viz rows: fixed position, no drag handle */
+.pipe-row--fixed {
+  background: var(--bg-panel-fixed, rgba(0,0,0,0.04));
+  border-radius: 3px;
+  padding-left: 4px;
+}
+
+.pipe-role-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted, #888);
+  width: 18px;
+  text-align: center;
+  user-select: none;
+  flex-shrink: 0;
+}
+
 .drag-handle {
   /* cursor: grab; */
   padding: 0 0px;

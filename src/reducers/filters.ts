@@ -39,6 +39,8 @@ export default function filters(state: Filter[] = initialState, action: FiltersA
       ]
 
     case ACTION.UP_FILTER:
+      // index 0 = input (fixed), index 1 = first processing filter — cannot move above input
+      if (action.index <= 1) return state
       return [
         ...state.slice(0, action.index - 1),
         state[action.index],
@@ -47,6 +49,8 @@ export default function filters(state: Filter[] = initialState, action: FiltersA
       ]
 
     case ACTION.DOWN_FILTER:
+      // last index = viz (fixed), second-to-last = last processing filter — cannot move below viz
+      if (action.index >= state.length - 2) return state
       return [
         ...state.slice(0, action.index),
         state[action.index + 1],
@@ -62,7 +66,8 @@ export default function filters(state: Filter[] = initialState, action: FiltersA
     }
 
     case ACTION.DELETE_FILTER:
-      if (action.index >= 0 && action.index < state.length)
+      // cannot delete input (index 0) or viz (last)
+      if (action.index > 0 && action.index < state.length - 1)
         return [...state.slice(0, action.index), ...state.slice(action.index + 1)]
       return state
 

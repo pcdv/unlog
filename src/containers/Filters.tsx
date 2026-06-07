@@ -130,6 +130,10 @@ const Filters: React.FC = () => {
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const { isDark, toggleDarkMode } = useDarkMode();
 
+  const inputFilter = filters[0];
+  const processingFilters = filters.slice(1, -1);
+  const vizFilter = filters[filters.length - 1];
+
   function handleDragStart(index: number) {
     setDragIndex(index);
   }
@@ -161,7 +165,7 @@ const Filters: React.FC = () => {
           title={folded ? "Expand pipeline" : "Collapse pipeline"}
         >
           {folded
-            ? `▶ ${filters.length} pipe${filters.length !== 1 ? "s" : ""}`
+            ? `▶ ${processingFilters.length} pipe${processingFilters.length !== 1 ? "s" : ""}`
             : "▼ hide"}
         </button>
         <div style={{ flex: 1 }} />
@@ -173,73 +177,73 @@ const Filters: React.FC = () => {
         </button>
       </div>
       <ColorRulesPanel />
-      {!folded &&
-        filters.map((filter) =>
-          getComponentForFilter(filter, dispatch, {
-            isDragging: dragIndex === filter.index,
-            isDropTarget: dropIndex === filter.index,
-            onDragStart: () => handleDragStart(filter.index),
-            onDragOver: (e) => handleDragOver(e, filter.index),
-            onDrop: (e) => handleDrop(e, filter.index),
-            onDragEnd: handleDragEnd,
-          }),
-        )}
+      {!folded && (
+        <>
+          {/* ── Input ── */}
+          {inputFilter && (
+            <div className="pipe-row pipe-row--fixed">
+              <span className="pipe-role-badge">in</span>
+              <EnableFilter filter={inputFilter} dispatch={dispatch} />
+              <ChooseInputType filter={inputFilter} dispatch={dispatch} />
+              {getComponentForFilter0(inputFilter, dispatch)}
+            </div>
+          )}
+          {/* ── Processing filters ── */}
+          {processingFilters.map((filter) => {
+            const classes = [
+              "pipe-row",
+              dragIndex === filter.index && "pipe-row--dragging",
+              dropIndex === filter.index && "pipe-row--droptarget",
+            ]
+              .filter(Boolean)
+              .join(" ");
+            return (
+              <div
+                key={filter.index}
+                className={classes}
+                onDragOver={(e) => handleDragOver(e, filter.index)}
+                onDrop={(e) => handleDrop(e, filter.index)}
+              >
+                <span
+                  className="drag-handle"
+                  draggable
+                  onDragStart={() => handleDragStart(filter.index)}
+                  onDragEnd={handleDragEnd}
+                  title="Drag to reorder"
+                >
+                  ⠿
+                </span>
+                <button
+                  className="delete-filter"
+                  onClick={() => dispatch(deleteFilter(filter.index))}
+                  title="Delete"
+                >
+                  ✕
+                </button>
+                <EnableFilter filter={filter} dispatch={dispatch} />
+                <ChooseProcessingType filter={filter} dispatch={dispatch} />
+                {getComponentForFilter0(filter, dispatch)}
+              </div>
+            );
+          })}
+          {/* ── Viz ── */}
+          {vizFilter && (
+            <div className="pipe-row pipe-row--fixed">
+              <span className="pipe-role-badge">out</span>
+              <EnableFilter filter={vizFilter} dispatch={dispatch} />
+              <ChooseVizType filter={vizFilter} dispatch={dispatch} />
+              {getComponentForFilter0(vizFilter, dispatch)}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
 
 export default Filters;
 
-interface DragProps {
-  isDragging: boolean;
-  isDropTarget: boolean;
-  onDragStart: () => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-  onDragEnd: () => void;
-}
 
-function getComponentForFilter(
-  filter: ChainedFilter,
-  dispatch: AppDispatch,
-  drag: DragProps,
-) {
-  const classes = [
-    "pipe-row",
-    drag.isDragging && "pipe-row--dragging",
-    drag.isDropTarget && "pipe-row--droptarget",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  return (
-    <div
-      key={filter.index}
-      className={classes}
-      onDragOver={drag.onDragOver}
-      onDrop={drag.onDrop}
-    >
-      <span
-        className="drag-handle"
-        draggable
-        onDragStart={drag.onDragStart}
-        onDragEnd={drag.onDragEnd}
-        title="Drag to reorder"
-      >
-        ⠿
-      </span>
-      <button
-        className="delete-filter"
-        onClick={() => dispatch(deleteFilter(filter.index))}
-        title="Delete"
-      >
-        ✕
-      </button>
-      <EnableFilter filter={filter} dispatch={dispatch} />
-      <ChooseType filter={filter} dispatch={dispatch} />
-      {getComponentForFilter0(filter, dispatch)}
-    </div>
-  );
-}
 
 function getComponentForFilter0(filter: ChainedFilter, dispatch: AppDispatch) {
   switch (filter.type) {
@@ -525,24 +529,42 @@ const EnableFilter: React.FC<FilterProps> = ({ filter, dispatch }) => (
   />
 );
 
-const ChooseType: React.FC<FilterProps> = ({ filter, dispatch }) => (
+const ChooseInputType: React.FC<FilterProps> = ({ filter, dispatch }) => (
   <select
-    value={filter.type || "invalid"}
+    value={filter.type || "cat"}
     onChange={(e) =>
-      dispatch(
-        updateFilter(filter.index, { type: e.target.value as Filter["type"] }),
-      )
+      dispatch(updateFilter(filter.index, { type: e.target.value as Filter["type"] }))
     }
   >
-    <option value=""></option>
     <option value="cat">cat</option>
     <option value="text">text</option>
+  </select>
+);
+
+const ChooseProcessingType: React.FC<FilterProps> = ({ filter, dispatch }) => (
+  <select
+    value={filter.type || ""}
+    onChange={(e) =>
+      dispatch(updateFilter(filter.index, { type: e.target.value as Filter["type"] }))
+    }
+  >
+    <option value="">—</option>
     <option value="grep">grep</option>
     <option value="replace">replace</option>
-    <option value="throughput">throughput</option>
-    <option value="sample">sample</option>
-    <option value="roundtrip">roundtrip</option>
     <option value="sort">sort</option>
+    <option value="sample">sample</option>
+    <option value="throughput">throughput</option>
+    <option value="roundtrip">roundtrip</option>
+  </select>
+);
+
+const ChooseVizType: React.FC<FilterProps> = ({ filter, dispatch }) => (
+  <select
+    value={filter.type || "show"}
+    onChange={(e) =>
+      dispatch(updateFilter(filter.index, { type: e.target.value as Filter["type"] }))
+    }
+  >
     <option value="show">show</option>
     <option value="chart">chart</option>
   </select>
