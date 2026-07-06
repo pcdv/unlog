@@ -160,7 +160,6 @@ const Filters: React.FC = () => {
   return (
     <div className="filters-panel">
       <div className="filters-toolbar">
-        <button onClick={() => dispatch(addFilter())}>Add pipe</button>
         <button
           onClick={() => setFolded((f) => !f)}
           title={folded ? "Expand pipeline" : "Collapse pipeline"}
@@ -169,6 +168,8 @@ const Filters: React.FC = () => {
             ? `▶ ${processingFilters.length} pipe${processingFilters.length !== 1 ? "s" : ""}`
             : "▼ hide"}
         </button>
+        <ColorRulesPanel />
+
         <div style={{ flex: 1 }} />
         <button
           onClick={toggleDarkMode}
@@ -177,9 +178,9 @@ const Filters: React.FC = () => {
           {isDark ? "☀️ Light" : "🌙 Dark"}
         </button>
       </div>
-      <ColorRulesPanel />
       {!folded && (
         <>
+          <button onClick={() => dispatch(addFilter())}>Add pipe</button>
           {/* ── Input ── */}
           {inputFilter && (
             <div className="pipe-row pipe-row--fixed">
@@ -243,8 +244,6 @@ const Filters: React.FC = () => {
 };
 
 export default Filters;
-
-
 
 function getComponentForFilter0(filter: ChainedFilter, dispatch: AppDispatch) {
   switch (filter.type) {
@@ -557,7 +556,9 @@ const ChooseInputType: React.FC<FilterProps> = ({ filter, dispatch }) => (
   <select
     value={filter.type || "cat"}
     onChange={(e) =>
-      dispatch(updateFilter(filter.index, { type: e.target.value as Filter["type"] }))
+      dispatch(
+        updateFilter(filter.index, { type: e.target.value as Filter["type"] }),
+      )
     }
   >
     <option value="cat">cat</option>
@@ -570,7 +571,9 @@ const ChooseProcessingType: React.FC<FilterProps> = ({ filter, dispatch }) => (
   <select
     value={filter.type || ""}
     onChange={(e) =>
-      dispatch(updateFilter(filter.index, { type: e.target.value as Filter["type"] }))
+      dispatch(
+        updateFilter(filter.index, { type: e.target.value as Filter["type"] }),
+      )
     }
   >
     <option value="">—</option>
@@ -587,7 +590,9 @@ const ChooseVizType: React.FC<FilterProps> = ({ filter, dispatch }) => (
   <select
     value={filter.type || "show"}
     onChange={(e) =>
-      dispatch(updateFilter(filter.index, { type: e.target.value as Filter["type"] }))
+      dispatch(
+        updateFilter(filter.index, { type: e.target.value as Filter["type"] }),
+      )
     }
   >
     <option value="show">show</option>
