@@ -154,4 +154,5 @@ export interface FileSelectionState {
 export interface SettingsState {
   maxLines: number
   maxChars: number
+  headerFolded?: boolean
 }

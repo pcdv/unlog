@@ -5,22 +5,22 @@
   z-index: 100;
   background: var(--bg-panel);
   border-bottom: 1px solid var(--border-panel);
-  padding: 4px 4px;
+  padding: 2px 4px;
   font-size: 12px;
 }
 
 .filters-toolbar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding-bottom: 2px;
+  gap: 4px;
+  padding-bottom: 1px;
 }
 
 .pipe-row {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 0;
+  padding: 1px 0;
   /* border-top: 1px solid #dde0e8; */
   flex-wrap: wrap;
 }

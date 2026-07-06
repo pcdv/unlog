@@ -13,6 +13,7 @@ import {
   loadFile,
   removeColorRule,
   updateColorRule,
+  setHeaderFolded,
 } from "../actions/filterActions";
 import { getChainedFilters } from "../selectors/result";
 import FileInput from "../forks/react-simple-file-input";
@@ -126,7 +127,7 @@ const ColorRulesPanel: React.FC = () => {
 const Filters: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const filters = useSelector((state: RootState) => getChainedFilters(state));
-  const [folded, setFolded] = useState(false);
+  const folded = useSelector((state: RootState) => state.settings.headerFolded ?? false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const { isDark, toggleDarkMode } = useDarkMode();
@@ -161,13 +162,34 @@ const Filters: React.FC = () => {
     <div className="filters-panel">
       <div className="filters-toolbar">
         <button
-          onClick={() => setFolded((f) => !f)}
+          onClick={() => dispatch(setHeaderFolded(!folded))}
           title={folded ? "Expand pipeline" : "Collapse pipeline"}
         >
           {folded
             ? `▶ ${processingFilters.length} pipe${processingFilters.length !== 1 ? "s" : ""}`
             : "▼ hide"}
         </button>
+        {folded && inputFilter?.type === "clipboard" && (
+          <button
+            onClick={async () => {
+              const text = await navigator.clipboard.readText();
+              dispatch(updateFilter(inputFilter.index, { text }));
+            }}
+          >
+            Paste
+          </button>
+        )}
+        {folded && inputFilter?.type === "cat" && (
+          inputFilter.fileName ? (
+            <span style={{ fontSize: 11, opacity: 0.7, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }}>
+              {inputFilter.fileName}
+            </span>
+          ) : (
+            <FileInput onChange={(file) => dispatch(loadFile(inputFilter.index, file))}>
+              <button>Select file…</button>
+            </FileInput>
+          )
+        )}
         <ColorRulesPanel />
 
         <div style={{ flex: 1 }} />

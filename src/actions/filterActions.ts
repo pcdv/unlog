@@ -13,12 +13,13 @@ function removePrivateFields(obj: Filter): FilterUpdate {
 
 export function updateQuery() {
   return (_dispatch: AppDispatch, getState: () => RootState) => {
-    const { filters, colorRules } = getState()
+    const { filters, colorRules, settings } = getState()
     const encodedFilters = serializeFilters(filters.map(removePrivateFields))
     const encodedColors = serializeColorRules(colorRules)
     const parts: string[] = []
     if (encodedFilters) parts.push(`f=${encodedFilters}`)
     if (encodedColors) parts.push(`c=${encodedColors}`)
+    if (settings.headerFolded) parts.push('h=1')
     // Set URL directly (no URLSearchParams) to avoid double percent-encoding
     const newUrl = parts.length
       ? `${window.location.pathname}?${parts.join('&')}`
@@ -57,6 +58,11 @@ export function initFilters() {
       const rules = deserializeColorRules(colorMatch[1])
       dispatch({ type: ACTION.SET_COLOR_RULES, rules })
     }
+    // Parse header folded state
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('h') === '1') {
+      dispatch({ type: ACTION.SET_HEADER_FOLDED, folded: true })
+    }
   }
 }
 
@@ -77,6 +83,13 @@ export function updateColorRule(index: number, patch: { color?: string; pattern?
 export function removeColorRule(index: number) {
   return (dispatch: AppDispatch) => {
     dispatch({ type: ACTION.REMOVE_COLOR_RULE, index })
+    dispatch(updateQuery())
+  }
+}
+
+export function setHeaderFolded(folded: boolean) {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: ACTION.SET_HEADER_FOLDED, folded })
     dispatch(updateQuery())
   }
 }
