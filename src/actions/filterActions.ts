@@ -140,7 +140,7 @@ export function deleteFilter(index: number) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TYPE_TO_CODE: Record<string, string> = {
-  cat: 'c', text: 't', grep: 'g', include: 'g', exclude: 'e',
+  cat: 'c', text: 't', clipboard: 'cb', grep: 'g', include: 'g', exclude: 'e',
   replace: 'r', sort: 's', sample: 'sa', throughput: 'th',
   roundtrip: 'rt', show: 'sh', chart: 'ch',
 }
@@ -148,7 +148,7 @@ const TYPE_TO_CODE: Record<string, string> = {
 // 2-char codes must be listed before 1-char for longest-match parsing
 const CODE_TO_TYPE: [string, string][] = [
   ['sa', 'sample'], ['th', 'throughput'], ['rt', 'roundtrip'],
-  ['sh', 'show'], ['ch', 'chart'],
+  ['sh', 'show'], ['ch', 'chart'], ['cb', 'clipboard'],
   ['c', 'cat'], ['t', 'text'], ['g', 'grep'], ['e', 'exclude'],
   ['r', 'replace'], ['s', 'sort'],
 ]
@@ -170,6 +170,7 @@ function serializeFilter(f: FilterUpdate): string {
       if (f.fileName != null) fields.push(`n=${encodeValue(f.fileName)}`)
       break
     case 'text':
+    case 'clipboard':
       // text content is not serialised to the URL — it can be arbitrarily large
       break
     case 'grep': case 'include': case 'exclude':
@@ -242,6 +243,7 @@ function deserializeFilter(s: string): Filter {
         if (key === 'n' && val != null) filter.fileName = val
         break
       case 'text':
+      case 'clipboard':
         // text content is not serialised to the URL
         break
       case 'grep': case 'include': case 'exclude':
@@ -313,7 +315,7 @@ function escplus(s: string): string {
 
 export function serializeColorRules(rules: ColorRule[]): string | undefined {
   if (!rules.length) return undefined
-  return rules.map(r => `${r.color}:${encodeValue(r.pattern)}`).join('~')
+  return rules.map(r => `${encodeValue(r.color)}:${encodeValue(r.pattern)}`).join('~')
 }
 
 export function deserializeColorRules(encoded: string): ColorRule[] {
@@ -322,7 +324,7 @@ export function deserializeColorRules(encoded: string): ColorRule[] {
     .map(s => {
       const colonIdx = s.indexOf(':')
       if (colonIdx < 0) return null
-      const color = s.slice(0, colonIdx)
+      const color = decodeURIComponent(s.slice(0, colonIdx))
       const pattern = decodeURIComponent(s.slice(colonIdx + 1))
       return { color, pattern }
     })
